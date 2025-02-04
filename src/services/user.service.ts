@@ -47,3 +47,21 @@ export const insertUser = async (user: UserInsertArgs): Promise<IUserData> => {
         throw new Error(error.message);
     }
 }
+
+/**
+ * Checks if a refresh token exists for a user by their unique ID.
+ */
+export const checkRefreshTokenExistsById = async (_id: string, refreshToken: string): Promise<boolean> => {
+    const functionName = 'checkRefreshTokenExistsById';
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const UserExists = await User.exists({ _id, refreshToken });
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return UserExists !== null;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}

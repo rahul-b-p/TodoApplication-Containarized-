@@ -2,6 +2,7 @@ import express from 'express';
 import './config/env.config';
 import { logger } from './utils';
 import { morganLogger } from './config';
+import { connectMongoDB } from './database';
 
 
 const app = express();
@@ -10,9 +11,13 @@ const port = process.env.PORT || 3000;
 /**
  * Initializing the express application, and listening at the given port
  */
-const InitializeApp = () => {
+const InitializeApp = async() => {
     try {
 
+        // Connecting Database
+        await connectMongoDB();
+        
+        
         //using morgan logger on application
         app.use(morganLogger);
 

@@ -1,7 +1,10 @@
 import { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME } from "../config";
+import { errorMessage } from "../constants";
 import { FunctionStatus, Roles } from "../enums";
+import { createUserSchema } from "../schemas";
 import { insertUser, isAdminExists } from "../services";
 import { UserInsertArgs } from "../types";
+import { checkEmailValidity } from "../validators";
 import { logFunctionInfo } from "./logger";
 
 
@@ -25,6 +28,11 @@ export const createDefultAdmin = async (): Promise<void> => {
             password: ADMIN_PASSWORD,
             role: Roles.ADMIN
         }
+
+        createUserSchema.parse(newAdmin);
+
+        const isValidEmail = await checkEmailValidity(newAdmin.email);
+        if (!isValidEmail) throw new Error(errorMessage.INVALID_EMAIL);
 
         const insertedAdmin = await insertUser(newAdmin);
         logFunctionInfo(functionName, FunctionStatus.SUCCESS, `Created new Admin with ID:${insertedAdmin._id}`);

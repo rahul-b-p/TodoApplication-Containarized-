@@ -3,6 +3,7 @@ import './config/env.config';
 import { createDefultAdmin, logger } from './utils';
 import { morganLogger } from './config';
 import { connectMongoDB } from './database';
+import { ErrorHandler } from './middlewares';
 
 
 const app = express();
@@ -20,9 +21,18 @@ const InitializeApp = async() => {
         // Default Admin Creation
         await createDefultAdmin();
         
-        
         //using morgan logger on application
         app.use(morganLogger);
+
+        // using json body parsing middleware
+        app.use(express.json());
+
+
+
+
+        // Using error request handler
+        app.use(ErrorHandler);
+
 
         // listening the application on port
         app.listen(port,()=>{

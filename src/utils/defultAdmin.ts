@@ -4,7 +4,7 @@ import { FunctionStatus, Roles } from "../enums";
 import { createUserSchema } from "../schemas";
 import { insertUser, isAdminExists } from "../services";
 import { UserInsertArgs } from "../types";
-import { checkEmailValidity } from "../validators";
+import { checkEmailValidity, validateEmailUniqueness } from "../validators";
 import { logFunctionInfo } from "./logger";
 
 
@@ -33,6 +33,9 @@ export const createDefultAdmin = async (): Promise<void> => {
 
         const isValidEmail = await checkEmailValidity(newAdmin.email);
         if (!isValidEmail) throw new Error(errorMessage.INVALID_EMAIL);
+
+        const isUniqueEmailOnSystem = await validateEmailUniqueness(newAdmin.email);
+        if (!isUniqueEmailOnSystem) throw new Error(errorMessage.EMAIL_ALREADY_EXISTS);
 
         const insertedAdmin = await insertUser(newAdmin);
         logFunctionInfo(functionName, FunctionStatus.SUCCESS, `Created new Admin with ID:${insertedAdmin._id}`);

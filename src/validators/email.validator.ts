@@ -1,6 +1,7 @@
 import * as dns from 'dns';
 import { logFunctionInfo } from '../utils';
 import { FunctionStatus } from '../enums';
+import { User } from '../models';
 
 
 
@@ -30,4 +31,23 @@ export const checkEmailValidity = (email: string): Promise<boolean> => {
             reject(error)
         }
     });
+}
+
+
+/**
+ * Validates the uniqueness of an email by checking if any user is registered with the given email address.
+*/
+export const validateEmailUniqueness = async (email: string): Promise<boolean> => {
+    const functionName = validateEmailUniqueness.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const emailExists = await User.exists({ email });
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return emailExists === null;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
 }

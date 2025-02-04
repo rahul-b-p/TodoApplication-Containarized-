@@ -17,5 +17,6 @@ export const {
     INVALID_PASSWORD_FORMAT = "Password must be at least 8 characters long and include at least one letter, one number, and one special character.",
     INVALID_ROLE = "Role should be 'admin' or 'user'",
 
-    
+    // User
+    EMAIL_ALREADY_EXISTS="User Already Exists with given Email ID"
 } = {} as const

@@ -10,7 +10,11 @@ const requiredEnvVariables: string[] = [
     'HASH_SALT_ROUNDS',
     'ADMIN_USERNAME',
     'ADMIN_EMAIL',
-    'ADMIN_PASSWORD'
+    'ADMIN_PASSWORD',
+    'ACCESS_TOKEN_EXPIRATION',
+    'ACCESS_TOKEN_SECRET',
+    'REFRESH_TOKEN_EXPIRATION',
+    'REFRESH_TOKEN_SECRET'
 ];
 
 
@@ -32,3 +36,9 @@ export const HASH_SALT_ROUNDS = process.env.HASH_SALT_ROUNDS as string;
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME as string;
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL as string;
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
+
+export const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION as string;
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET as string;
+
+export const REFRESH_TOKEN_EXPIRATION = process.env.ESH_TOKEN_EXPIRATION as string;
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string

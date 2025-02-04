@@ -6,7 +6,8 @@ config();
 
 
 const requiredEnvVariables: string[] = [
-    'MONGODB_URI'
+    'MONGODB_URI',
+    'HASH_SALT_ROUNDS'
 ];
 
 
@@ -22,3 +23,5 @@ requiredEnvVariables.forEach((envVar) => {
 });
 
 export const MONGODB_URI = process.env.MONGODB_URI as string;
+
+export const HASH_SALT_ROUNDS = process.env.HASH_SALT_ROUNDS as string;

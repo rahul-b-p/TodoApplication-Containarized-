@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
-import { Roles } from "../enums";
+import { Roles, UserSortKeys } from "../enums";
 import { IUser } from "../interfaces";
+import { PageInfo } from "./page.type";
 
 
 export type UserAuthBody = {
@@ -43,4 +44,16 @@ export type UserToShow = UserAuthBody & {
     updatedAt: Date;
 }
 
-export type UserUpdateBody =Partial<Omit<UserInsertArgs,'password'>>
+export type UserUpdateBody = Partial<Omit<UserInsertArgs, 'password'>>;
+
+export type UserFilterQuery = {
+    pageNo: string;
+    pageLimit: string;
+    role?: Roles;
+    sortKey?: UserSortKeys;
+    username?: string;
+}
+
+export type UserFetchResult = PageInfo & {
+    data: UserToShow[];
+}

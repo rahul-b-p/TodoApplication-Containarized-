@@ -1,8 +1,8 @@
-import { FunctionStatus, Roles } from "../enums";
+import { FunctionStatus, Roles, UserSortArgs } from "../enums";
 import { IUser } from "../interfaces";
 import { User } from "../models";
-import { IUserData, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
-import { hashPassword, logFunctionInfo } from "../utils";
+import { IUserData, UserFetchResult, UserFilterQuery, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
+import { calculatePageSkip, getUserSortArgs, hashPassword, logFunctionInfo } from "../utils";
 
 
 
@@ -128,3 +128,96 @@ export const findUserDatasById = async (_id: string): Promise<UserToShow | null>
         throw new Error(error.message);
     }
 }
+
+
+/**
+ * To aggregate filter count
+*/
+export const getUserFilterCount = async (matchFilter: Record<string, string>): Promise<number> => {
+    try {
+        const totalFilter = await User.aggregate([
+            { $match: matchFilter },
+            {
+                $count: 'totalCount'  // Count all documents matching the filter
+            }
+        ]);
+
+        return totalFilter.length > 0 ? totalFilter[0].totalCount : 0;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+/**
+ * To aggreagate user by filter,search, sort and pagenating
+ */
+export const filterUsers = async (matchFilter: Record<string, any>, sort: UserSortArgs, skip: number, limit: number): Promise<UserToShow[]> => {
+    try {
+        return await User.aggregate([
+            { $match: matchFilter },
+            { $sort: JSON.parse(sort) },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $project: {
+                    _id: 1,
+                    username: 1,
+                    email: 1,
+                    phone: 1,
+                    role: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    verified: 1,
+                },
+            },
+        ]);
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+/**
+ * Fetches all users using aggregation with support for filtering, sorting, and pagination.
+ */
+export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResult | null> => {
+    const functionName = 'fetchUsers';
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const { role, pageNo, pageLimit, sortKey, username } = query;
+
+        const matchFilter: Record<string, any> = {};
+        if (role) {
+            matchFilter.role = role
+        }
+        if (username) {
+            matchFilter.username = { $regex: username, $options: "i" };
+        }
+
+        const sort: UserSortArgs = getUserSortArgs(sortKey);
+
+        const page = Number(pageNo);
+        const limit = Number(pageLimit)
+        const skip = calculatePageSkip(page, limit);
+        
+        const totalItems = await getUserFilterCount(matchFilter);
+
+        const users: UserToShow[] = await filterUsers(matchFilter, sort, skip, limit)
+
+        const totalPages = Math.ceil(totalItems / limit);
+        const fetchResult: UserFetchResult = {
+            page,
+            pageSize: limit,
+            totalPages,
+            totalItems,
+            data: users
+        }
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return users.length > 0 ? fetchResult : null;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+};

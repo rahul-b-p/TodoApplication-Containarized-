@@ -1,9 +1,9 @@
 import { SentMessageInfo } from "nodemailer";
 import { HOST_EMAIL_ID, transporter } from "../config"
-import { EmailOptions, OTPMailResponse } from "../types";
+import { EmailOptions, IUserData, OTPMailResponse } from "../types";
 import { generateOtp, logFunctionInfo, logger } from "../utils"
 import { FunctionStatus } from "../enums";
-import { getOtpMessage, getOtpMessageHTML } from "../email";
+import { getOtpMessage, getOtpMessageHTML, getUserUpdationNotification, getUserUpdationNotificationHTML } from "../email";
 import { errorMessage } from "../constants";
 
 
@@ -75,3 +75,28 @@ export const sendOtpForPasswordReset = async (email: string): Promise<OTPMailRes
         throw new Error(errorMessage.FAILED_TO_SEND_OTP_EMAIL);
     }
 };
+
+/**
+ * Sends an account updation acknowledgment notification to the recipient's email address.
+ */
+export const sendUserUpdationNotification = async (to: string, updatedUser: IUserData, existingEmail: string,): Promise<SentMessageInfo> => {
+    const functionName = sendUserUpdationNotification.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const emailOptions: EmailOptions = {
+            to,
+            subject: "Your Account email has been edited",
+            html: getUserUpdationNotificationHTML(updatedUser.username, existingEmail, updatedUser.email),
+            text: getUserUpdationNotification(updatedUser.username, existingEmail, updatedUser.email)
+        }
+
+        const mailOPtions = await sendEmail(emailOptions);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return mailOPtions;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}

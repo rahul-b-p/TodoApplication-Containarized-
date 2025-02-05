@@ -20,3 +20,6 @@ router.put('/:id', roleAuth(Roles.ADMIN), validateReqBody(userUpdateSchema), use
 
 // API to delete user by admin
 router.delete('/:id', roleAuth(Roles.ADMIN), userController.deleteUser);
+
+// API to find user by id on admin side
+router.get('/:id', roleAuth(Roles.ADMIN), userController.readUserById);

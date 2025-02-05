@@ -3,7 +3,7 @@ import { errorMessage, responseMessage } from "../constants";
 import { FunctionStatus } from "../enums";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { customRequestWithPayload } from "../interfaces";
-import { deleteUserById, fetchUsers, findUserById, insertUser, sendUserCreationNotification, sendUserUpdationNotification, updateUserById } from "../services";
+import { deleteUserById, fetchUsers, findUserById, findUserDatasById, insertUser, sendUserCreationNotification, sendUserUpdationNotification, updateUserById } from "../services";
 import { UserFilterQuery, UserInsertArgs, UserUpdateBody } from "../types";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
 import { checkEmailValidity, validateEmailUniqueness, validateObjectId } from "../validators";
@@ -145,6 +145,32 @@ export const deleteUser = async (req: customRequestWithPayload<{ id: string }>, 
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.USER_DELETED));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to read a specific user
+ * @param id user id
+ * @protected only admin can access this feature
+ */
+export const readUserById = async (req: customRequestWithPayload<{ id: string }>, res: Response, next: NextFunction) => {
+    const functionName = readUserById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const { id } = req.params;
+        const isValidId = validateObjectId(id);
+        if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
+
+        const existingUser = await findUserDatasById(id);
+        if (!existingUser) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.USER_DATA_FETCHED, existingUser));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

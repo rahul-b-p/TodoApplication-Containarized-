@@ -10,6 +10,7 @@ export interface IUser extends Document {
     password: string;
     role: Roles;
     refreshToken?: string;
+    verified:boolean
     createdAt: Date;
     updatedAt: Date;
 }

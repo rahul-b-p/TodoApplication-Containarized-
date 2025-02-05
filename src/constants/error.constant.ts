@@ -7,8 +7,10 @@ export const {
     REQUEST_FAILED = "Oops, the request failed!",
     CLIENT_SIDE_REQUEST_FAILED = "An error occurred while processing the request on the client side.",
     SERVER_ISSUE = "An error occurred at the server. Please try again later.",
-    NO_USER_ID_IN_PAYLOAD="No user ID found in payload.",
+    NO_USER_ID_IN_PAYLOAD = "No user ID found in payload.",
     ACCESSTOKEN_MISSING = "Access token is missing from the header after authentication middleware.",
+    FAILED_TO_SEND_OTP_EMAIL = "Failed to send OTP email. Please try again.",
+    USER_EXISTANCE_FAILURE = "Failed to ensure user existance on syatem",
 
     // zod validation
     INVALID_USERNAME = "Username is Required, and should be string",
@@ -27,6 +29,8 @@ export const {
     INVALID_TOKEN = "Invalid token",
     INVALID_REQUEST_BODY = "Invalid Request Body :",
     INVALID_REQUEST_QUERY = "Invalid Request Query :",
+    INVALID_OTP_FORMAT = "OTP must be a 6-digit number.",
+    PASSWORDS_MUST_MATCH = "Passwords do not match with the confirm password field.",
 
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
@@ -38,6 +42,8 @@ export const {
     JWT_SIGNING_FAILED = "JWT signing failed.",
     INVALID_PASSWORD = "Invalid Password, Not match with the user",
     AUTHORIZATION_FAILED = "Authorization procedure failed at the server.",
-    
+    EMAIL_VALIDATION_FAILED = "Email validation failed.",
+    INVALID_OTP = "Email verification failed. Invalid OTP.",
+
 } = {} as const
 

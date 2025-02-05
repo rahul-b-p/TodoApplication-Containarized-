@@ -2,6 +2,7 @@ import { z } from "zod";
 import { errorMessage } from "../constants";
 import { passwordSchema } from "./password.schema";
 import { Roles } from "../enums";
+import { otpSchema } from "./otp.schema";
 
 
 
@@ -26,3 +27,28 @@ export const userSignupSchema = z.object({
     email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email(errorMessage.INVALID_EMAIL),
     password: passwordSchema
 }).strict();
+
+
+export const userAccountVerificationSchema = z.object({
+    email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email(errorMessage.INVALID_EMAIL),
+    otp: otpSchema
+})
+
+
+export const forgotPasswordSchema = z.object({
+    email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email({ message: errorMessage.INVALID_EMAIL })
+}).strict();
+
+
+export const resetPasswordSchema = z.object({
+    email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email({ message: errorMessage.INVALID_EMAIL }),
+    otp: otpSchema,
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+}).strict().refine(
+    (data) => data.password === data.confirmPassword,
+    {
+        message: errorMessage.PASSWORDS_MUST_MATCH,
+        path: ["confirmPassword"],
+    }
+);

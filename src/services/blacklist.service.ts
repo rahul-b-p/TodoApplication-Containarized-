@@ -27,7 +27,7 @@ export const isTokenBlacklisted = async (token: string): Promise<boolean> => {
  * Black list the given token until its expiration time
  */
 export const blacklistToken = async (token: string): Promise<IBlackList> => {
-    const functionName = 'blacklistToken';
+    const functionName = blacklistToken.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {

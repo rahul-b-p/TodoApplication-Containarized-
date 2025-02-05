@@ -201,7 +201,7 @@ export const forgotPassword = async (req: Request<{}, any, { email: string }>, r
  * The forgotPassword function should be used to generate and send the OTP to the user.
  */
 export const resetPassword = async (req: Request<{}, any, UserPasswordResetBody>, res: Response, next: NextFunction) => {
-    const functionName = 'resetPassword';
+    const functionName = resetPassword.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const { otp, email, confirmPassword } = req.body;

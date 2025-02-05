@@ -1,6 +1,6 @@
 import { FunctionStatus } from "../enums";
 import { PageInfo, PageNationFeilds } from "../types";
-import { logFunctionInfo } from "./logger";
+import { logFunctionInfo } from "../utils/logger";
 
 
 /**

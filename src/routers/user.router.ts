@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { roleAuth, validateReqBody, validateReqQuery } from "../middlewares";
-import { createUserSchema, userFilterQuerySchema } from "../schemas";
+import { createUserSchema, userFilterQuerySchema, userUpdateSchema } from "../schemas";
 import { Roles } from "../enums";
 import { userController } from "../controllers";
 
@@ -14,3 +14,6 @@ router.post('/', roleAuth(Roles.ADMIN), validateReqBody(createUserSchema), userC
 
 // API to fetch users by admin(included filter, serach, sort and pagenation)
 router.get('/', roleAuth(Roles.ADMIN), validateReqQuery(userFilterQuerySchema), userController.readAllUsers);
+
+// API to update user by admin
+router.put('/:id', roleAuth(Roles.ADMIN), validateReqBody(userUpdateSchema), userController.updateUser);

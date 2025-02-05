@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Roles, UserSortKeys } from "../enums";
 import { IUser } from "../interfaces";
 import { PageInfo } from "./page.type";
+import { boolean } from "zod";
 
 
 export type UserAuthBody = {
@@ -44,7 +45,9 @@ export type UserToShow = UserAuthBody & {
     updatedAt: Date;
 }
 
-export type UserUpdateBody = Partial<Omit<UserInsertArgs, 'password'>>;
+export type UserUpdateBody = Partial<Omit<UserInsertArgs, 'password'>> & {
+    verified?: boolean
+};
 
 export type UserFilterQuery = {
     pageNo: string;
@@ -56,4 +59,10 @@ export type UserFilterQuery = {
 
 export type UserFetchResult = PageInfo & {
     data: UserToShow[];
+}
+
+export type UserUpdateRequirments = {
+    message: string;
+    arguments: UserUpdateArgs;
+    mailTo?: string[];
 }

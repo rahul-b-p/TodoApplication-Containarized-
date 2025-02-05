@@ -1,8 +1,9 @@
 import { FunctionStatus, Roles, UserSortArgs } from "../enums";
+import { calculatePageSkip } from "../helpers";
 import { IUser } from "../interfaces";
 import { User } from "../models";
 import { IUserData, UserFetchResult, UserFilterQuery, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
-import { calculatePageSkip, getUserSortArgs, hashPassword, logFunctionInfo } from "../utils";
+import { getUserSortArgs, hashPassword, logFunctionInfo } from "../utils";
 
 
 
@@ -200,7 +201,7 @@ export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResul
         const page = Number(pageNo);
         const limit = Number(pageLimit)
         const skip = calculatePageSkip(page, limit);
-        
+
         const totalItems = await getUserFilterCount(matchFilter);
 
         const users: UserToShow[] = await filterUsers(matchFilter, sort, skip, limit)

@@ -1,3 +1,4 @@
+
 export const {
 
     //application
@@ -37,12 +38,13 @@ export const {
     INVALID_SORT_KEY = "Invalid sort key.",
     PAGE_NUMBER_MUST_BE_DIGITS = "Page number must be provided in digits.",
     PAGE_LIMIT_MUST_BE_DIGITS = "Page limit must be provided in digits.",
+    INVALID_ID = "Invalid Unique Id",
 
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
     USER_NOT_FOUND = "No User Found with given data",
     EMAIL_ALREADY_IN_USE = "The email address you entered is already associated with your account.",
-    USER_DATA_NOT_FOUND="No User data found to show",
+    USER_DATA_NOT_FOUND = "No User data found to show",
 
     // Auth
     TOKEN_SIGN_FAILED = "Failed to sign the token. Please check your secret key and expiration time.",

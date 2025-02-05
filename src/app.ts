@@ -4,6 +4,7 @@ import { createDefultAdmin, logger } from './utils';
 import { morganLogger } from './config';
 import { connectMongoDB } from './database';
 import { ErrorHandler } from './middlewares';
+import { authRouter } from './routers';
 
 
 const app = express();
@@ -12,7 +13,7 @@ const port = process.env.PORT || 3000;
 /**
  * Initializing the express application, and listening at the given port
  */
-const InitializeApp = async() => {
+const InitializeApp = async () => {
     try {
 
         // Connecting Database
@@ -20,7 +21,7 @@ const InitializeApp = async() => {
 
         // Default Admin Creation
         await createDefultAdmin();
-        
+
         //using morgan logger on application
         app.use(morganLogger);
 
@@ -28,6 +29,8 @@ const InitializeApp = async() => {
         app.use(express.json());
 
 
+        // using routers
+        app.use('/auth', authRouter)
 
 
         // Using error request handler
@@ -35,7 +38,7 @@ const InitializeApp = async() => {
 
 
         // listening the application on port
-        app.listen(port,()=>{
+        app.listen(port, () => {
             logger.info(`Server running successfully at http://localhost:${port}`);
         });
 

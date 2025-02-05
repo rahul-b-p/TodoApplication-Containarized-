@@ -40,5 +40,5 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD as string;
 export const ACCESS_TOKEN_EXPIRATION = process.env.ACCESS_TOKEN_EXPIRATION as string;
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET as string;
 
-export const REFRESH_TOKEN_EXPIRATION = process.env.ESH_TOKEN_EXPIRATION as string;
+export const REFRESH_TOKEN_EXPIRATION = process.env.REFRESH_TOKEN_EXPIRATION as string;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string

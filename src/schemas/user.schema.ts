@@ -13,3 +13,9 @@ export const createUserSchema = z.object({
     password: passwordSchema,
     role: z.nativeEnum(Roles, { message: errorMessage.INVALID_ROLE }).optional()
 }).strict();
+
+
+export const userLoginSchema = z.object({
+    email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email(errorMessage.INVALID_EMAIL),
+    password: passwordSchema,
+}).strict()

@@ -3,7 +3,7 @@ import { errorMessage, responseMessage } from "../constants";
 import { FunctionStatus } from "../enums";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { customRequestWithPayload } from "../interfaces";
-import { fetchUsers, findUserById, insertUser, sendUserCreationNotification, sendUserUpdationNotification, updateUserById } from "../services";
+import { deleteUserById, fetchUsers, findUserById, insertUser, sendUserCreationNotification, sendUserUpdationNotification, updateUserById } from "../services";
 import { UserFilterQuery, UserInsertArgs, UserUpdateBody } from "../types";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
 import { checkEmailValidity, validateEmailUniqueness, validateObjectId } from "../validators";
@@ -120,6 +120,31 @@ export const updateUser = async (req: customRequestWithPayload<{ id: string }, a
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json({ ...await sendCustomResponse(updateRequirments.message, updatedUser), verifyLink: email ? '/auth/login' : undefined });
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to delete a user
+ * @param id user id
+ * @protected only admin can access this feature
+ */
+export const deleteUser = async (req: customRequestWithPayload<{ id: string }>, res: Response, next: NextFunction) => {
+    const functionName = deleteUser.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const { id } = req.params;
+        const isValidId = validateObjectId(id);
+        if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
+
+        const isDeleted = await deleteUserById(id);
+        if (!isDeleted) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.USER_DELETED));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

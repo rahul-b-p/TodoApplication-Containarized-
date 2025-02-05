@@ -17,3 +17,6 @@ router.get('/', roleAuth(Roles.ADMIN), validateReqQuery(userFilterQuerySchema), 
 
 // API to update user by admin
 router.put('/:id', roleAuth(Roles.ADMIN), validateReqBody(userUpdateSchema), userController.updateUser);
+
+// API to delete user by admin
+router.delete('/:id', roleAuth(Roles.ADMIN), userController.deleteUser);

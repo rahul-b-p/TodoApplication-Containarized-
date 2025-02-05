@@ -19,6 +19,7 @@ export const {
     // USER
     USER_CREATED ="New User Created Successfully",
     USER_DATA_FETCHED="User data fetched successfully",
-    USER_UPDATED="User Updated Successfully"
+    USER_UPDATED="User Updated Successfully",
+    USER_DELETED="User Deleted Successfully"
 
 } = {} as const;

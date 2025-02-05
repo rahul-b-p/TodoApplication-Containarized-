@@ -222,3 +222,22 @@ export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResul
         throw new Error(error.message);
     }
 };
+
+
+/**
+ * Delets an existing user data by its unique id.
+*/
+export const deleteUserById = async (_id: string): Promise<boolean> => {
+    const functionName = deleteUserById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const deletedUser = await User.findByIdAndDelete(_id);
+
+        if (!deletedUser) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return deletedUser !== null;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}

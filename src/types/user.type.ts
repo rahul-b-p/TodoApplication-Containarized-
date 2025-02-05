@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Roles } from "../enums";
 import { IUser } from "../interfaces";
 
@@ -32,4 +33,12 @@ export type VerifyUserBody = {
 export type UserPasswordResetBody = VerifyUserBody & {
     password: string;
     confirmPassword: string;
+}
+
+export type UserToShow = UserAuthBody & {
+    _id: Types.ObjectId;
+    role: Roles;
+    verified: boolean
+    createdAt: Date;
+    updatedAt: Date;
 }

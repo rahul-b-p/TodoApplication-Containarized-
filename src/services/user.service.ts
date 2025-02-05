@@ -1,7 +1,7 @@
 import { FunctionStatus, Roles } from "../enums";
 import { IUser } from "../interfaces";
 import { User } from "../models";
-import { IUserData, UserInsertArgs, UserUpdateArgs } from "../types";
+import { IUserData, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
 import { hashPassword, logFunctionInfo } from "../utils";
 
 
@@ -105,6 +105,24 @@ export const findUserById = async (_id: string): Promise<IUser | null> => {
 
         if (user) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return user;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}
+
+
+/**
+ * To Get Unsensitive UserData By its id
+ */
+export const findUserDatasById = async (_id: string): Promise<UserToShow | null> => {
+    const functionName = findUserDatasById.name;
+    try {
+        const user = await User.findById(_id).select('-password -refreshToken -__v');
+        if (!user) return null;
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return user as UserToShow;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error.message);

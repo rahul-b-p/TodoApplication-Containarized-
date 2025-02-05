@@ -1,11 +1,15 @@
 import { NextFunction, Response } from "express";
 import { customRequestWithPayload } from "../interfaces";
 import { logFunctionInfo } from "../utils";
-import { FunctionStatus } from "../enums";
-import { AuthenticationError } from "../errors";
+import { FunctionStatus, Roles } from "../enums";
+import { AuthenticationError, ForbiddenError, InternalServerError } from "../errors";
 import { verifyAccessToken, verifyRefreshToken } from "../jwt";
-import { blacklistToken, checkRefreshTokenExistsById, isTokenBlacklisted } from "../services";
+import { blacklistToken, checkRefreshTokenExistsById, findUserById, isTokenBlacklisted } from "../services";
 import { validateObjectId } from "../validators";
+import { errorMessage } from "../constants";
+
+
+
 
 /**
  * Middleware function to Authorize Access Token by JWT
@@ -32,6 +36,7 @@ export const accessTokenAuth = async (req: customRequestWithPayload, res: Respon
         next(error);
     }
 };
+
 
 /**
  * Middleware function to Authorize Access Token by JWT
@@ -63,3 +68,28 @@ export const refreshTokenAuth = async (req: customRequestWithPayload, res: Respo
     }
 };
 
+
+/**
+ * Middleware function to Authorize user Role 
+ */
+export const roleAuth = (...allowedRole: Roles[]) => {
+    const functionName = roleAuth.name;
+
+    return async (req: customRequestWithPayload, res: Response, next: NextFunction) => {
+        logFunctionInfo(functionName, FunctionStatus.START);
+        try {
+            const id = req.payload?.id;
+            if (!id) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+
+            const existingUser = await findUserById(id);
+            if (!existingUser) throw new AuthenticationError()
+
+            if (!allowedRole.includes(existingUser.role)) throw new ForbiddenError(errorMessage.INSUFFICIENT_PRIVILEGES);
+
+            next();
+        } catch (error: any) {
+            logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+            next(error);
+        }
+    }
+}

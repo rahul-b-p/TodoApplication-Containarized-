@@ -16,5 +16,10 @@ export const {
     PROFILE_UPDATED = 'Your profile has been updated',
     PROFILE_FETCHED = 'Your Profile Data has been Fetched Successfully',
 
+    // USER
+    USER_CREATED ="New User Created Successfully",
+    USER_DATA_FETCHED="User data fetched successfully",
+    USER_UPDATED="User Updated Successfully",
+    USER_DELETED="User Deleted Successfully"
 
 } = {} as const;

@@ -9,6 +9,7 @@ This OTP will expire in 5 minutes.
     `
 }
 
+
 /**
  * To get user updation notification mail in text format
  */
@@ -26,7 +27,34 @@ Once you’ve completed the verification, you’ll have full access to the syste
 We’re excited to have you with us. Welcome aboard!
 
 Best regards,
-[Your Company Name]
+Todo App
+[Support Contact Information]
+
+    `
+}
+
+
+/**
+ * To get user creation acknowledgment mail in text format
+ */
+export const getUserCreationNotification = (username: string, role: string, email: string) => {
+    return `
+Hi ${username},
+
+Welcome to Todo App!
+
+Your ${role} account has been successfully created on Todo App. Here are your account details:
+- Email: ${email}
+
+To activate your account, please verify your email and set your password using the link below:
+[Activation Link]
+
+Once you’ve completed the verification, you’ll have full access to the system. If you need any assistance, don’t hesitate to contact our support team.
+
+We’re excited to have you with us. Welcome aboard!
+
+Best regards,
+Todo App
 [Support Contact Information]
 
     `

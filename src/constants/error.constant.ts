@@ -8,6 +8,7 @@ export const {
     CLIENT_SIDE_REQUEST_FAILED = "An error occurred while processing the request on the client side.",
     SERVER_ISSUE = "An error occurred at the server. Please try again later.",
     NO_USER_ID_IN_PAYLOAD="No user ID found in payload.",
+    ACCESSTOKEN_MISSING = "Access token is missing from the header after authentication middleware.",
 
     // zod validation
     INVALID_USERNAME = "Username is Required, and should be string",

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserAuthBody, UserInsertArgs, userSignUpBody } from "../types";
 import { FunctionStatus, Roles } from "../enums";
 import { comparePassword, logFunctionInfo, sendCustomResponse } from "../utils";
-import { findUserByEmail, findUserById, insertUser, signNewTokens } from "../services";
+import { blacklistToken, findUserByEmail, findUserById, insertUser, signNewTokens, updateUserById } from "../services";
 import { AuthenticationError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
@@ -69,7 +69,7 @@ export const signUp = async (req: Request<{}, any, userSignUpBody>, res: Respons
  * Controller function to handle the token refresh request.
  */
 export const refresh = async (req: customRequestWithPayload, res: Response, next: NextFunction) => {
-    const functionName = 'refresh';
+    const functionName = refresh.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {
@@ -83,6 +83,37 @@ export const refresh = async (req: customRequestWithPayload, res: Response, next
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.TOKEN_REFRESHED, { tokens }));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to handle the user logout request.
+ */
+export const logout = async (req: customRequestWithPayload, res: Response, next: NextFunction) => {
+    const functionName = logout.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const id = req.payload?.id;
+        if (!id) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+
+        const AccessToken = req.headers.authorization?.split(' ')[1];
+        if (!AccessToken) throw new InternalServerError(errorMessage.ACCESSTOKEN_MISSING);
+
+        const existingUser = await findUserById(id);
+        if (!existingUser) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        await blacklistToken(AccessToken);
+        if (existingUser.refreshToken) {
+            await blacklistToken(existingUser.refreshToken);
+            await updateUserById(existingUser._id.toString(), { $unset: { refreshToken: 1 } });
+        }
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_LOGOUT));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { refreshTokenAuth, validateReqBody } from "../middlewares";
+import { accessTokenAuth, refreshTokenAuth, validateReqBody } from "../middlewares";
 import { userLoginSchema, userSignupSchema } from "../schemas";
 import { authController } from "../controllers";
 
@@ -16,3 +16,6 @@ router.post('/signup', validateReqBody(userSignupSchema), authController.signUp)
 
 // API to refresh tokens
 router.post('/refresh', refreshTokenAuth, authController.refresh);
+
+// API ro logout
+router.post('/logout', accessTokenAuth, authController.logout);

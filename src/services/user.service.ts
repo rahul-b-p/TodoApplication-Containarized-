@@ -55,29 +55,10 @@ export const insertUser = async (user: UserInsertArgs): Promise<IUserData> => {
 
 
 /**
- * Checks if a refresh token exists for a user by their unique ID.
- */
-export const checkRefreshTokenExistsById = async (_id: string, refreshToken: string): Promise<boolean> => {
-    const functionName = 'checkRefreshTokenExistsById';
-    logFunctionInfo(functionName, FunctionStatus.START);
-
-    try {
-        const UserExists = await User.exists({ _id, refreshToken });
-
-        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
-        return UserExists !== null;
-    } catch (error: any) {
-        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
-        throw new Error(error.message);
-    }
-}
-
-
-/**
  * Finds an existing user by its unique email adress.
 */
 export const findUserByEmail = async (email: string): Promise<IUser | null> => {
-    const functionName = 'findUserByEmail';
+    const functionName = findUserByEmail.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const user = await User.findOne({ email });
@@ -95,7 +76,7 @@ export const findUserByEmail = async (email: string): Promise<IUser | null> => {
  * Updates an existing user data by its unique id.
 */
 export const updateUserById = async (_id: string, userToUpdate: UserUpdateArgs): Promise<IUserData | null> => {
-    const functionName = 'updateUserById';
+    const functionName = updateUserById.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const updatedUser = await User.findByIdAndUpdate(_id, userToUpdate, { new: true }).lean();
@@ -117,7 +98,7 @@ export const updateUserById = async (_id: string, userToUpdate: UserUpdateArgs):
  * Finds a user by its unique ID
  */
 export const findUserById = async (_id: string): Promise<IUser | null> => {
-    const functionName = 'findUserById';
+    const functionName = findUserById.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const user = await User.findById(_id).lean();

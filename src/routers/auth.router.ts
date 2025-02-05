@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { accessTokenAuth, refreshTokenAuth, validateReqBody } from "../middlewares";
-import { userLoginSchema, userSignupSchema } from "../schemas";
+import { userAccountVerificationSchema, userLoginSchema, userSignupSchema } from "../schemas";
 import { authController } from "../controllers";
 
 
@@ -19,3 +19,6 @@ router.post('/refresh', refreshTokenAuth, authController.refresh);
 
 // API ro logout
 router.post('/logout', accessTokenAuth, authController.logout);
+
+// API to verify and login by validating otp
+router.post('/verify', validateReqBody(userAccountVerificationSchema), authController.verifyAndLogin);

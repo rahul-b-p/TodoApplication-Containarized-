@@ -28,6 +28,7 @@ export const {
     INVALID_TOKEN = "Invalid token",
     INVALID_REQUEST_BODY = "Invalid Request Body :",
     INVALID_REQUEST_QUERY = "Invalid Request Query :",
+    INVALID_OTP_FORMAT = "OTP must be a 6-digit number.",
 
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
@@ -39,7 +40,8 @@ export const {
     JWT_SIGNING_FAILED = "JWT signing failed.",
     INVALID_PASSWORD = "Invalid Password, Not match with the user",
     AUTHORIZATION_FAILED = "Authorization procedure failed at the server.",
-    EMAIL_VALIDATION_FAILED = "Email validation failed."
+    EMAIL_VALIDATION_FAILED = "Email validation failed.",
+    INVALID_OTP = "Email verification failed. Invalid OTP.",
     
 } = {} as const
 

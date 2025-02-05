@@ -23,3 +23,8 @@ export type UserUpdateArgs = {
         officeId?: 1
     };
 };
+
+export type VerifyUserBody = {
+    email: string;
+    otp: string;
+}

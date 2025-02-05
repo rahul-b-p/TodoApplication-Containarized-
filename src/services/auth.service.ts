@@ -51,3 +51,31 @@ export const checkRefreshTokenExistsById = async (_id: string, refreshToken: str
         throw new Error(error.message);
     }
 }
+
+
+
+/**
+ * to sign tokens with verifying account and saving the password
+ */
+export const verfyAccountAndSignNewTokens = async (userData: IUser): Promise<TokenResonse> => {
+    const functionName = verfyAccountAndSignNewTokens.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+
+        const accessToken = await signAccessToken(userData._id.toString(), userData.role);
+        const refreshToken = await signRefreshToken(userData._id.toString(), userData.role);
+
+        const updateRefreshToken: UserUpdateArgs = { $set: { refreshToken, verified: true } };
+        await updateUserById(userData._id.toString(), updateRefreshToken);
+
+        return {
+            accessToken,
+            refreshToken,
+            tokenType: 'Bearer'
+        }
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message)
+    }
+}

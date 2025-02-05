@@ -2,6 +2,7 @@ import { z } from "zod";
 import { errorMessage } from "../constants";
 import { passwordSchema } from "./password.schema";
 import { Roles } from "../enums";
+import { otpSchema } from "./otp.schema";
 
 
 
@@ -26,3 +27,9 @@ export const userSignupSchema = z.object({
     email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email(errorMessage.INVALID_EMAIL),
     password: passwordSchema
 }).strict();
+
+
+export const userAccountVerificationSchema =z.object({
+    email: z.string({ message: errorMessage.EMAIL_REQUIRED }).email(errorMessage.INVALID_EMAIL),
+    otp: otpSchema
+})

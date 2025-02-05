@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { UserAuthBody, UserInsertArgs, userSignUpBody } from "../types";
-import { FunctionStatus, Roles } from "../enums";
+import { UserAuthBody, userSignUpBody, VerifyUserBody } from "../types";
+import { FunctionStatus } from "../enums";
 import { comparePassword, logFunctionInfo, logger, sendCustomResponse } from "../utils";
-import { blacklistToken, findUserByEmail, findUserById, insertUser, saveOtp, sendEmailVerificationMail, signNewTokens, updateUserById } from "../services";
+import { blacklistToken, findUserByEmail, findUserById, insertUser, saveOtp, sendEmailVerificationMail, signNewTokens, updateUserById, verfyAccountAndSignNewTokens, verifyOtp } from "../services";
 import { AuthenticationError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
@@ -129,6 +129,34 @@ export const logout = async (req: customRequestWithPayload, res: Response, next:
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_LOGOUT));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to handle verify account and login  by otp validation.
+ */
+export const verifyAndLogin = async (req: Request<{}, any, VerifyUserBody>, res: Response, next: NextFunction) => {
+    const functionName = verifyAndLogin.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const { otp, email } = req.body;
+
+        const existingUser = await findUserByEmail(email);
+        if (!existingUser) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        const isValidOtp = await verifyOtp(existingUser._id.toString(), otp);
+        if (!isValidOtp) throw new AuthenticationError(errorMessage.INVALID_OTP);
+
+        const tokens = await verfyAccountAndSignNewTokens(existingUser);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.statusMessage = "Login Successful";
+        res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_LOGIN, { tokens }));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

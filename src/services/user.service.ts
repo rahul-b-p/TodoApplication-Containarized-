@@ -183,7 +183,7 @@ export const filterUsers = async (matchFilter: Record<string, any>, sort: UserSo
  * Fetches all users using aggregation with support for filtering, sorting, and pagination.
  */
 export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResult | null> => {
-    const functionName = 'fetchUsers';
+    const functionName = fetchUsers.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const { role, pageNo, pageLimit, sortKey, username } = query;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { validateReqBody } from "../middlewares";
+import { refreshTokenAuth, validateReqBody } from "../middlewares";
 import { userLoginSchema, userSignupSchema } from "../schemas";
 import { authController } from "../controllers";
 
@@ -13,3 +13,6 @@ router.post('/login', validateReqBody(userLoginSchema), authController.login);
 
 // API to signup as user(can't signup as an admin)
 router.post('/signup', validateReqBody(userSignupSchema), authController.signUp);
+
+// API to refresh tokens
+router.post('/refresh', refreshTokenAuth, authController.refresh);

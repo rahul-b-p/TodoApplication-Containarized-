@@ -38,7 +38,7 @@ export const insertUser = async (user: UserInsertArgs): Promise<IUserData> => {
         if (!user.role) {
             user.role = Roles.USER;
         }
-        
+
         const newUser: IUser = new User(user);
         await newUser.save();
 
@@ -111,3 +111,21 @@ export const updateUserById = async (_id: string, userToUpdate: UserUpdateArgs):
         throw new Error(error.message);
     }
 };
+
+
+/**
+ * Finds a user by its unique ID
+ */
+export const findUserById = async (_id: string): Promise<IUser | null> => {
+    const functionName = 'findUserById';
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const user = await User.findById(_id).lean();
+
+        if (user) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return user;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}

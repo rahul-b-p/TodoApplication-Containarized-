@@ -7,6 +7,7 @@ export const {
     REQUEST_FAILED = "Oops, the request failed!",
     CLIENT_SIDE_REQUEST_FAILED = "An error occurred while processing the request on the client side.",
     SERVER_ISSUE = "An error occurred at the server. Please try again later.",
+    NO_USER_ID_IN_PAYLOAD="No user ID found in payload.",
 
     // zod validation
     INVALID_USERNAME = "Username is Required, and should be string",
@@ -34,6 +35,8 @@ export const {
     TOKEN_SIGN_FAILED = "Failed to sign the token. Please check your secret key and expiration time.",
     TOKEN_SIGN_ERROR = "Unexpected error occurred while signing the token.",
     JWT_SIGNING_FAILED = "JWT signing failed.",
-    INVALID_PASSWORD = "Invalid Password, Not match with the user"
+    INVALID_PASSWORD = "Invalid Password, Not match with the user",
+    AUTHORIZATION_FAILED = "Authorization procedure failed at the server.",
+    
 } = {} as const
 

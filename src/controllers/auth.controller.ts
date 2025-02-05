@@ -2,10 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { UserAuthBody, UserInsertArgs, userSignUpBody } from "../types";
 import { FunctionStatus, Roles } from "../enums";
 import { comparePassword, logFunctionInfo, sendCustomResponse } from "../utils";
-import { findUserByEmail, insertUser, signNewTokens } from "../services";
-import { AuthenticationError, BadRequestError, ConflictError, NotFoundError } from "../errors";
+import { findUserByEmail, findUserById, insertUser, signNewTokens } from "../services";
+import { AuthenticationError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
+import { customRequestWithPayload } from "../interfaces";
 
 
 /**
@@ -57,6 +58,31 @@ export const signUp = async (req: Request<{}, any, userSignUpBody>, res: Respons
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_SIGNUP, newUser));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to handle the token refresh request.
+ */
+export const refresh = async (req: customRequestWithPayload, res: Response, next: NextFunction) => {
+    const functionName = 'refresh';
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const id = req.payload?.id;
+        if (!id) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+
+        const existingUser = await findUserById(id);
+        if (!existingUser) throw new InternalServerError(errorMessage.AUTHORIZATION_FAILED);
+
+        const tokens = await signNewTokens(existingUser);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.TOKEN_REFRESHED, { tokens }));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

@@ -4,7 +4,7 @@ import { Roles } from "../enums";
 
 
 
-export const userSchema = new Schema<IUser>({
+const userSchema = new Schema<IUser>({
     username: {
         type: String,
         required: true

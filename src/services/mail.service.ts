@@ -3,7 +3,7 @@ import { HOST_EMAIL_ID, transporter } from "../config"
 import { EmailOptions, IUserData, OTPMailResponse } from "../types";
 import { generateOtp, logFunctionInfo, logger } from "../utils"
 import { FunctionStatus } from "../enums";
-import { getOtpMessage, getOtpMessageHTML, getUserUpdationNotification, getUserUpdationNotificationHTML } from "../email";
+import { getOtpMessage, getOtpMessageHTML, getUserCreationNotification, getUserCreationNotificationHTML, getUserUpdationNotification, getUserUpdationNotificationHTML } from "../emails";
 import { errorMessage } from "../constants";
 
 
@@ -93,6 +93,34 @@ export const sendUserUpdationNotification = async (to: string, updatedUser: IUse
 
         const mailOPtions = await sendEmail(emailOptions);
 
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return mailOPtions;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
+    }
+}
+
+
+
+
+/**
+ * Sends an account creation acknowledgment notification to the recipient's email address.
+ */
+export const sendUserCreationNotification = async (user: IUserData): Promise<SentMessageInfo> => {
+    const functionName = sendUserCreationNotification.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const { role, email, username } = user;
+
+        const emailOptions: EmailOptions = {
+            to: email,
+            subject: `Welcome to [Your Company Name] - Account Created`,
+            text: getUserCreationNotification(username, role, email),
+            html: getUserCreationNotificationHTML(username, role, email)
+        }
+
+        const mailOPtions = await sendEmail(emailOptions);
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return mailOPtions;
     } catch (error: any) {

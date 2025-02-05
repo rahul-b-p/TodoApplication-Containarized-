@@ -51,3 +51,27 @@ export const sendEmailVerificationMail = async (email: string): Promise<OTPMailR
 };
 
 
+/**
+ * Generates an OTP for password reset and sends it to the specified recipient's email address.
+ */
+export const sendOtpForPasswordReset = async (email: string): Promise<OTPMailResponse> => {
+    const functionName = sendOtpForPasswordReset.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const otp = generateOtp();
+        const emailOptions: EmailOptions = {
+            to: email,
+            subject: 'Password Reset Request',
+            text: getOtpMessage(otp),
+            html: getOtpMessageHTML(otp)
+        };
+
+        const mailInfo = await sendEmail(emailOptions);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return { mailInfo, otp };
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(errorMessage.FAILED_TO_SEND_OTP_EMAIL);
+    }
+};

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { UserAuthBody, userSignUpBody, VerifyUserBody } from "../types";
+import { UserAuthBody, UserPasswordResetBody, UserSignUpBody, VerifyUserBody } from "../types";
 import { FunctionStatus } from "../enums";
 import { comparePassword, logFunctionInfo, logger, sendCustomResponse } from "../utils";
-import { blacklistToken, findUserByEmail, findUserById, insertUser, saveOtp, sendEmailVerificationMail, signNewTokens, updateUserById, verfyAccountAndSignNewTokens, verifyOtp } from "../services";
+import { blacklistToken, findUserByEmail, findUserById, insertUser, resetPasswordById, saveOtp, sendEmailVerificationMail, sendOtpForPasswordReset, signNewTokens, updateUserById, verfyAccountAndSignNewTokens, verifyOtp } from "../services";
 import { AuthenticationError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
@@ -56,7 +56,7 @@ export const login = async (req: Request<{}, any, UserAuthBody>, res: Response, 
 /**
  * Controller Function to sign up as user
  */
-export const signUp = async (req: Request<{}, any, userSignUpBody>, res: Response, next: NextFunction) => {
+export const signUp = async (req: Request<{}, any, UserSignUpBody>, res: Response, next: NextFunction) => {
     const functionName = signUp.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
@@ -157,6 +157,65 @@ export const verifyAndLogin = async (req: Request<{}, any, VerifyUserBody>, res:
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.statusMessage = "Login Successful";
         res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_LOGIN, { tokens }));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to handle the user forgot password request, and generates OTP.
+ * The resetPassword feature should be used to complete the password reset process.
+ */
+export const forgotPassword = async (req: Request<{}, any, { email: string }>, res: Response, next: NextFunction) => {
+    const functionName = forgotPassword.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const { email } = req.body;
+
+        const existingUser = await findUserByEmail(email);
+        if (!existingUser) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        const { mailInfo, otp } = await sendOtpForPasswordReset(existingUser.email);
+        logger.info(mailInfo);
+        if (mailInfo.accepted.length <= 0) throw new Error(errorMessage.EMAIL_VALIDATION_FAILED);
+
+        saveOtp(otp, existingUser._id.toString());
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json({
+            message: responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION,
+            emailSent: true
+        });
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller function to reset the user password by OTP validation
+ * The forgotPassword function should be used to generate and send the OTP to the user.
+ */
+export const resetPassword = async (req: Request<{}, any, UserPasswordResetBody>, res: Response, next: NextFunction) => {
+    const functionName = 'resetPassword';
+    logFunctionInfo(functionName, FunctionStatus.START);
+    try {
+        const { otp, email, confirmPassword } = req.body;
+
+        const existingUser = await findUserByEmail(email);
+        if (!existingUser) throw new NotFoundError(errorMessage.USER_NOT_FOUND);
+
+        const isValidOtp = await verifyOtp(existingUser._id.toString(), otp);
+        if (!isValidOtp) throw new AuthenticationError(errorMessage.INVALID_OTP);
+
+        await resetPasswordById(existingUser._id.toString(), confirmPassword);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.PASSWORD_UPDATED));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { accessTokenAuth, refreshTokenAuth, validateReqBody } from "../middlewares";
-import { userAccountVerificationSchema, userLoginSchema, userSignupSchema } from "../schemas";
+import { forgotPasswordSchema, resetPasswordSchema, userAccountVerificationSchema, userLoginSchema, userSignupSchema } from "../schemas";
 import { authController } from "../controllers";
 
 
@@ -22,3 +22,9 @@ router.post('/logout', accessTokenAuth, authController.logout);
 
 // API to verify and login by validating otp
 router.post('/verify', validateReqBody(userAccountVerificationSchema), authController.verifyAndLogin);
+
+// API to request otp in password forgot,or password reset
+router.post('/forgot-password', validateReqBody(forgotPasswordSchema), authController.forgotPassword);
+
+// API to reset password by validating otp
+router.put('/reset-password', validateReqBody(resetPasswordSchema), authController.resetPassword);

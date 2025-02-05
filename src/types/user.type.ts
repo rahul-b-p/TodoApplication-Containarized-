@@ -14,7 +14,7 @@ export type UserInsertArgs = UserAuthBody & {
     role?: Roles;
 }
 
-export type userSignUpBody = Omit<UserInsertArgs, 'role'>;
+export type UserSignUpBody = Omit<UserInsertArgs, 'role'>;
 
 export type UserUpdateArgs = {
     $set?: Partial<IUser>;
@@ -27,4 +27,9 @@ export type UserUpdateArgs = {
 export type VerifyUserBody = {
     email: string;
     otp: string;
+}
+
+export type UserPasswordResetBody = VerifyUserBody & {
+    password: string;
+    confirmPassword: string;
 }

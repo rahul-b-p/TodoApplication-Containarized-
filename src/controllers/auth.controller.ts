@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { UserAuthBody } from "../types";
-import { FunctionStatus } from "../enums";
+import { UserAuthBody, UserInsertArgs, userSignUpBody } from "../types";
+import { FunctionStatus, Roles } from "../enums";
 import { comparePassword, logFunctionInfo, sendCustomResponse } from "../utils";
-import { findUserByEmail, signNewTokens } from "../services";
-import { AuthenticationError, NotFoundError } from "../errors";
+import { findUserByEmail, insertUser, signNewTokens } from "../services";
+import { AuthenticationError, BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
+import { checkEmailValidity, validateEmailUniqueness } from "../validators";
 
 
 /**
@@ -32,5 +33,32 @@ export const login = async (req: Request<{}, any, UserAuthBody>, res: Response, 
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error)
+    }
+}
+
+
+/**
+ * Controller Function to sign up as user
+ */
+export const signUp = async (req: Request<{}, any, userSignUpBody>, res: Response, next: NextFunction) => {
+    const functionName = signUp.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const { email } = req.body;
+
+        const isValidEmail = await checkEmailValidity(email);
+        if (!isValidEmail) throw new BadRequestError(errorMessage.INVALID_EMAIL);
+
+        const isUniqueEmail = await validateEmailUniqueness(email);
+        if (!isUniqueEmail) throw new ConflictError(errorMessage.EMAIL_ALREADY_EXISTS);
+
+        const newUser = await insertUser(req.body);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.SUCCESS_SIGNUP, newUser));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
     }
 }

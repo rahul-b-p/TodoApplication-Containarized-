@@ -34,6 +34,11 @@ export const insertUser = async (user: UserInsertArgs): Promise<IUserData> => {
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         user.password = await hashPassword(user.password);
+
+        if (!user.role) {
+            user.role = Roles.USER;
+        }
+        
         const newUser: IUser = new User(user);
         await newUser.save();
 

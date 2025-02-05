@@ -11,8 +11,10 @@ export type IUserData = Omit<IUser, 'password' | 'refreshToken'>;
 
 export type UserInsertArgs = UserAuthBody & {
     username: string;
-    role: Roles;
+    role?: Roles;
 }
+
+export type userSignUpBody = Omit<UserInsertArgs, 'role'>;
 
 export type UserUpdateArgs = {
     $set?: Partial<IUser>;

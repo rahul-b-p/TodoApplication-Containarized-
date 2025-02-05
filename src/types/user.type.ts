@@ -42,3 +42,5 @@ export type UserToShow = UserAuthBody & {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type UserUpdateBody =Partial<Omit<UserInsertArgs,'password'>>

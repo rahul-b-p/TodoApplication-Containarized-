@@ -31,10 +31,12 @@ export const {
     INVALID_REQUEST_QUERY = "Invalid Request Query :",
     INVALID_OTP_FORMAT = "OTP must be a 6-digit number.",
     PASSWORDS_MUST_MATCH = "Passwords do not match with the confirm password field.",
+    AT_LEAST_ONE_FIELD_REQUIRED_FOR_UPDATE = "At least one field is required for update.",
 
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
     USER_NOT_FOUND = "No User Found with given data",
+    EMAIL_ALREADY_IN_USE = "The email address you entered is already associated with your account.",
 
     // Auth
     TOKEN_SIGN_FAILED = "Failed to sign the token. Please check your secret key and expiration time.",
@@ -44,6 +46,8 @@ export const {
     AUTHORIZATION_FAILED = "Authorization procedure failed at the server.",
     EMAIL_VALIDATION_FAILED = "Email validation failed.",
     INVALID_OTP = "Email verification failed. Invalid OTP.",
+    INSUFFICIENT_PRIVILEGES = "Forbidden: Insufficient role privileges.",
+
 
 } = {} as const
 

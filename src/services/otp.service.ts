@@ -31,7 +31,7 @@ export const saveOtp = async (otp: string, userId: string): Promise<string> => {
  * Generates an OTP for the given user and saves it in the database with a 5-minute expiration time.
  */
 export const verifyOtp = async (userId: string, otp: string): Promise<boolean> => {
-    const functionName = 'verifyOtp';
+    const functionName = verifyOtp.name;
     logFunctionInfo(functionName, FunctionStatus.START);
     try {
         const otpExisted = await Otp.exists({ userId, otp });

@@ -1,3 +1,5 @@
+import { SentMessageInfo } from "nodemailer";
+
 export type EmailOptions = {
     to: string,
     subject: string,
@@ -5,3 +7,8 @@ export type EmailOptions = {
     html: string
 }
 
+
+export type OTPMailResponse = {
+    mailInfo: SentMessageInfo;
+    otp: string;
+}

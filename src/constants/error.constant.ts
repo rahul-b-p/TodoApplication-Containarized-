@@ -9,6 +9,7 @@ export const {
     SERVER_ISSUE = "An error occurred at the server. Please try again later.",
     NO_USER_ID_IN_PAYLOAD="No user ID found in payload.",
     ACCESSTOKEN_MISSING = "Access token is missing from the header after authentication middleware.",
+    FAILED_TO_SEND_OTP_EMAIL = "Failed to send OTP email. Please try again.",
 
     // zod validation
     INVALID_USERNAME = "Username is Required, and should be string",
@@ -38,6 +39,7 @@ export const {
     JWT_SIGNING_FAILED = "JWT signing failed.",
     INVALID_PASSWORD = "Invalid Password, Not match with the user",
     AUTHORIZATION_FAILED = "Authorization procedure failed at the server.",
+    EMAIL_VALIDATION_FAILED = "Email validation failed."
     
 } = {} as const
 

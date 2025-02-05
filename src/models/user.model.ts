@@ -25,6 +25,11 @@ const userSchema = new Schema<IUser>({
     },
     refreshToken: {
         type: String
+    },
+    verified: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 }, {
     timestamps: true,

@@ -1,7 +1,10 @@
 import { SentMessageInfo } from "nodemailer";
 import { HOST_EMAIL_ID, transporter } from "../config"
-import { EmailOptions } from "../types";
-import {  logger } from "../utils"
+import { EmailOptions, OTPMailResponse } from "../types";
+import { generateOtp, logFunctionInfo, logger } from "../utils"
+import { FunctionStatus } from "../enums";
+import { getOtpMessage, getOtpMessageHTML } from "../email";
+import { errorMessage } from "../constants";
 
 
 
@@ -21,5 +24,30 @@ const sendEmail = async (emailOptions: EmailOptions): Promise<SentMessageInfo> =
 }
 
 
+/**
+ * Generates an OTP for initial login or account verification and sends it to the specified recipient's email address.
+ */
+export const sendEmailVerificationMail = async (email: string): Promise<OTPMailResponse> => {
+    const functionName = sendEmailVerificationMail.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const otp = generateOtp();
+        const emailOptions: EmailOptions = {
+            to: email,
+            subject: 'Your Email Verification OTP',
+            text: getOtpMessage(otp),
+            html: getOtpMessageHTML(otp)
+        };
+
+        const mailInfo = await sendEmail(emailOptions);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return { mailInfo, otp };
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(errorMessage.FAILED_TO_SEND_OTP_EMAIL);
+    }
+};
 
 

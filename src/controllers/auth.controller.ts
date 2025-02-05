@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { UserAuthBody, UserInsertArgs, userSignUpBody } from "../types";
 import { FunctionStatus, Roles } from "../enums";
-import { comparePassword, logFunctionInfo, sendCustomResponse } from "../utils";
-import { blacklistToken, findUserByEmail, findUserById, insertUser, signNewTokens, updateUserById } from "../services";
+import { comparePassword, logFunctionInfo, logger, sendCustomResponse } from "../utils";
+import { blacklistToken, findUserByEmail, findUserById, insertUser, saveOtp, sendEmailVerificationMail, signNewTokens, updateUserById } from "../services";
 import { AuthenticationError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
@@ -25,6 +25,21 @@ export const login = async (req: Request<{}, any, UserAuthBody>, res: Response, 
 
         const isVerifiedPassword = await comparePassword(password, existingUser.password);
         if (!isVerifiedPassword) throw new AuthenticationError(errorMessage.INVALID_PASSWORD);
+
+        if (!existingUser.verified) {
+
+            const { mailInfo, otp } = await sendEmailVerificationMail(existingUser.email);
+            logger.info(mailInfo);
+            if (mailInfo.accepted.length <= 0) throw new Error(errorMessage.EMAIL_VALIDATION_FAILED);
+
+            saveOtp(otp, existingUser._id.toString());
+            logFunctionInfo(functionName, FunctionStatus.PENDING, responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION);
+            res.status(200).json({
+                message: responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION,
+                emailSent: true
+            });
+            return;
+        }
 
         const tokens = await signNewTokens(existingUser);
 

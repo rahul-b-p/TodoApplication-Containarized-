@@ -23,3 +23,6 @@ router.put('/:id', validateReqBody(updateTodoSchema), todoController.updateTodo)
 
 // API to delete todo, Admin can delete any, while user can only access their own todos
 router.delete('/:id', todoController.deleteTodo);
+
+// API to find Todo by its unique id, Admin can fetch any, while user can only access their own todos
+router.get('/:id', todoController.readTodoById);

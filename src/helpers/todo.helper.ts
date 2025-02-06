@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { FunctionStatus } from "../enums";
 import { CompletedStatus } from "../enums/todo.enum";
-import { TimeInHHMM, TodoFilterQuery, UpdateTodoArgs, UpdateTodoBody, YYYYMMDD } from "../types";
+import { TimeInHHMM, TodoFilterQuery, TodoToShow, UpdateTodoArgs, UpdateTodoBody, YYYYMMDD } from "../types";
 import { logFunctionInfo } from "../utils";
 import { getDateFromStrings, getDayRange } from "./date.helper";
 import { errorMessage } from "../constants";
@@ -79,4 +79,21 @@ export const getTodoUpdateArgs = (updateBody: UpdateTodoBody, existingTodo: IToD
     }
 
     return restTodoUpdateBody;
+}
+
+
+/**
+ * To converts the type, in to `TodoToShow`, for more clarity in usage
+ */
+export const convertTodoToShow = (todoData: any): TodoToShow => {
+    return {
+        _id: todoData._id,
+        title: todoData.title,
+        description: todoData.description,
+        createdBy: todoData.createdBy,
+        dueAt: todoData.dueAt,
+        completed: todoData.completed,
+        createdAt: todoData.createdAt,
+        updatedAt: todoData.updatedAt,
+    }
 }

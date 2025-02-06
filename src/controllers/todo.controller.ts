@@ -5,7 +5,7 @@ import { DateStatus, FunctionStatus, Roles } from "../enums";
 import { InsertTodoArgs, TodoFilterQuery, UpdateTodoBody } from "../types";
 import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
-import { fetchTodos, findTodoById, findUserById, insertTodo, softDeleteTodoById, updateTodoById } from "../services";
+import { fetchTodoDataById, fetchTodos, findTodoById, findUserById, insertTodo, softDeleteTodoById, updateTodoById } from "../services";
 import { compareDatesWithCurrentDate, getTodoUpdateArgs, pagenate } from "../helpers";
 import { validateObjectId } from "../validators";
 
@@ -189,6 +189,42 @@ export const deleteTodo = async (req: customRequestWithPayload<{ id: string }>, 
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json({ ...await sendCustomResponse(responseMessage.TODO_DELETED), deletedAt });
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controler function to fetch a todo using its unique id
+ * - Admin can fetch any todos
+ *  - User can fetch a their own todos
+ * @param id unique idof todo
+ */
+export const readTodoById = async (req: customRequestWithPayload<{ id: string }>, res: Response, next: NextFunction) => {
+    const functionName = readTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const reqOwnerId = req.payload?.id;
+        if (!reqOwnerId) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+        const reqOwner = await findUserById(reqOwnerId);
+        if (!reqOwner) throw new AuthenticationError();
+
+        const { id } = req.params;
+        const isValidId = validateObjectId(id);
+        if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
+
+        const existingTodo = await fetchTodoDataById(id);
+        if (!existingTodo) throw new NotFoundError(errorMessage.TODO_NOT_FOUND);
+
+        if (reqOwner.role !== Roles.ADMIN && existingTodo.createdBy._id.toString() !== reqOwnerId) {
+            throw new ForbiddenError(errorMessage.UNAUTHORIZED_TODO_ACCESS);
+        }
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.TODO_DATA_FETCHED, existingTodo));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

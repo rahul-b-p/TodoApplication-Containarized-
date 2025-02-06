@@ -1,9 +1,9 @@
 import { FunctionStatus, TodoSortArgs } from "../enums";
-import { getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpers";
+import { convertTodoToShow, getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpers";
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
 import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
-import { getTodoSortArgs, logFunctionInfo, logger } from "../utils";
+import { getTodoSortArgs, logFunctionInfo } from "../utils";
 
 
 
@@ -105,7 +105,6 @@ export const filterTodos = async (matchFilter: Record<string, any>, sort: TodoSo
                     createdAt: 1,
                     updatedAt: 1,
                     completed: 1,
-                    isDeleted: 1
                 },
             },
         ]);
@@ -204,11 +203,35 @@ export const softDeleteTodoById = async (_id: string): Promise<Date | undefined 
         }, { new: true });
 
         if (!softDeletedTodo) return null;
-        
+
         if (softDeletedTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return softDeletedTodo?.deletedAt;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error);
+    }
+}
+
+
+/**
+ * To fetch Todo with all related feilds using its unique id
+ */
+export const fetchTodoDataById = async (_id: string): Promise<TodoToShow | null> => {
+    const functionName = fetchTodoDataById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+
+        const todo = await Todo.findOne({ _id, isDeleted: false }).populate({
+            path: 'createdBy',
+            select: '-password -refreshToken -createdAt -updatedAt -__v'
+        }).select('-isDeleted -deletedAt -__v');
+
+        if (!todo) return null;
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return convertTodoToShow(todo);
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error.message);
     }
 }

@@ -1,6 +1,5 @@
 import { Types } from "mongoose";
 import { TodoSortKeys } from "../enums";
-import { IToDo } from "../interfaces";
 import { YYYYMMDD } from "./date.type";
 import { PageFilter, PageInfo } from "./page.type";
 import { TimeInHHMM } from "./time.type";
@@ -30,9 +29,8 @@ export type TodoToShow = {
     dueAt: Date;
     completed: boolean;
     createdBy: UserToShow;
-    isDeleted: boolean;
     createdAt: Date;
-    deletedAt: Date;
+    updatedAt: Date;
 }
 
 export type TodoFetchResult = PageInfo & {

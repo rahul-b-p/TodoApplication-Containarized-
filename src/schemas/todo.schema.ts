@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { dueDateSchema, dueTimeSchema } from "./date.schema";
 import { errorMessage } from "../constants";
+import { objectIdRegex } from "../config";
+import { pageLimitSchema, pageNoSchema } from "./page.schema";
+import { TodoSortKeys } from "../enums";
+import { CompletedStatus } from "../enums/todo.enum";
 
 
 const titleSchema = z.string({ message: errorMessage.TITLE_REQUIRED }).min(5, errorMessage.TITLE_MIN_LENGTH);
@@ -12,4 +16,15 @@ export const createTodoSchema = z.object({
     description: descriptionSchema,
     dueDate: dueDateSchema,
     dueTime: dueTimeSchema
+}).strict();
+
+
+export const todoFilterSchema = z.object({
+    pageNo: pageNoSchema,
+    pageLimit: pageLimitSchema,
+    status: z.nativeEnum(CompletedStatus, { message: errorMessage.INVALID_COMPLETE_STATUS }).optional(),
+    title: z.string().optional(),
+    createdBy: z.string().regex(objectIdRegex, { message: errorMessage.INVALID_ID }).optional(),
+    dueAt: dueDateSchema.optional(),
+    sortKey: z.nativeEnum(TodoSortKeys, { message: errorMessage.INVALID_SORT_KEY }).optional()
 }).strict();

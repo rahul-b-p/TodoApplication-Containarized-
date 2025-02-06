@@ -49,6 +49,8 @@ export const {
     DESC_REQUIRED = "Description, required, asnd should be string",
     DESC_MIN_LENGTH = "Invalid description, At least five characters",
     DESC_MAX_LENGTH = "Invalid description. It should not exceed 200 characters.",
+    INVALID_COMPLETE_STATUS = "Todo completion status should be 'complete' or 'incomplete'",
+
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
     USER_NOT_FOUND = "No User Found with given data",
@@ -67,6 +69,7 @@ export const {
 
     // Todo
     PAST_DATE_NOT_ALLOWED = "Can't add a past date as due for todo",
+    TODO_DATA_NOT_FOUND = "No Todo data found to show",
 
 } = {} as const
 

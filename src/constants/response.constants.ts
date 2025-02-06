@@ -24,6 +24,6 @@ export const {
 
     // ToDo
     TODO_CREATED = "New Todo Created Successfully",
-
+    TODO_DATA_FETCHED = "Todo data fetched successfully",
     
 } = {} as const;

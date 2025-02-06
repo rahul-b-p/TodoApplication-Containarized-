@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
 import { customRequestWithPayload } from "../interfaces";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
-import { DateStatus, FunctionStatus } from "../enums";
-import { InsertTodoArgs } from "../types";
-import { AuthenticationError, BadRequestError, InternalServerError, NotFoundError } from "../errors";
+import { DateStatus, FunctionStatus, Roles } from "../enums";
+import { InsertTodoArgs, TodoFilterQuery } from "../types";
+import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
-import { findUserById, insertTodo } from "../services";
-import { compareDatesWithCurrentDate } from "../helpers";
+import { fetchTodos, findUserById, insertTodo } from "../services";
+import { compareDatesWithCurrentDate, pagenate } from "../helpers";
 import { validateObjectId } from "../validators";
 
 
@@ -66,6 +66,49 @@ export const createUserTodo = async (req: customRequestWithPayload<{ userId: str
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.TODO_CREATED, insertedTodo));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller Function to read all todos 
+ *  - Admin can read all todos
+ *  - User can read all their own todos
+ */
+export const readAllTodos = async (req: customRequestWithPayload<{}, any, any, TodoFilterQuery>, res: Response, next: NextFunction) => {
+    const functionName = readAllTodos.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const reqOwnerId = req.payload?.id;
+        if (!reqOwnerId) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+        const reqOwner = await findUserById(reqOwnerId);
+        if (!reqOwner) throw new AuthenticationError();
+
+        const query = req.query;
+
+        if (reqOwner.role !== Roles.ADMIN) {
+            if (query.createdBy) throw new ForbiddenError(errorMessage.INSUFFICIENT_PRIVILEGES);
+
+            query.createdBy = reqOwnerId;
+        }
+
+        const todoFetchResult = await fetchTodos(query);
+        const message = todoFetchResult ? responseMessage.TODO_DATA_FETCHED : errorMessage.TODO_DATA_NOT_FOUND;
+
+        let PageNationFeilds;
+        if (todoFetchResult) {
+            const { data, ...pageInfo } = todoFetchResult
+            PageNationFeilds = pagenate(pageInfo, req.originalUrl);
+        }
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json({
+            success: true, message, ...todoFetchResult, ...PageNationFeilds
+        });
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

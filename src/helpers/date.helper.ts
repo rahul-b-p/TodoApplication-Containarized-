@@ -1,6 +1,7 @@
 import { DateStatus, FunctionStatus } from "../enums";
-import { TimeInHHMM, YYYYMMDD } from "../types";
+import { DateRange, TimeInHHMM, YYYYMMDD } from "../types";
 import { logFunctionInfo, logger } from "../utils";
+import { errorMessage } from "../constants";
 
 
 
@@ -38,3 +39,28 @@ export const compareDatesWithCurrentDate = (inputDate: YYYYMMDD): DateStatus => 
         return DateStatus.Present;
     }
 };
+
+
+/**
+ * Returns the start and end of the given day as a range as array `[ start, end ]`.
+ */
+export const getDayRange = (dateString: YYYYMMDD): DateRange => {
+    const functionName = getDayRange.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL);
+        throw new Error(errorMessage.INVALID_DATE_FORMAT);
+    }
+
+    const date = new Date(dateString);
+
+    const start = new Date(date);
+    start.setUTCHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setUTCHours(23, 59, 59, 999);
+
+    logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+    return [start, end] as DateRange;
+}

@@ -38,3 +38,11 @@ export type TodoToShow = {
 export type TodoFetchResult = PageInfo & {
     data: TodoToShow[];
 }
+
+export type UpdateTodoBody = Partial<InsertTodoArgs> & {
+    completed?: boolean;
+}
+
+export type UpdateTodoArgs = Omit<UpdateTodoBody, 'dueDate' | 'dueTime'> & {
+    dueAt?: Date;
+}

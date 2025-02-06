@@ -12,6 +12,7 @@ export const {
     ACCESSTOKEN_MISSING = "Access token is missing from the header after authentication middleware.",
     FAILED_TO_SEND_OTP_EMAIL = "Failed to send OTP email. Please try again.",
     USER_EXISTANCE_FAILURE = "Failed to ensure user existance on syatem",
+    UNWANTED_DATE_UPDATE = "Date update is not allowed without a valid update body.",
 
     // zod validation
     INVALID_USERNAME = "Username is Required, and should be string",
@@ -50,6 +51,7 @@ export const {
     DESC_MIN_LENGTH = "Invalid description, At least five characters",
     DESC_MAX_LENGTH = "Invalid description. It should not exceed 200 characters.",
     INVALID_COMPLETE_STATUS = "Todo completion status should be 'complete' or 'incomplete'",
+    INVALID_COMPLETE_FIELD = "Completed feild should be provide as a boolean value",
 
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
@@ -70,6 +72,9 @@ export const {
     // Todo
     PAST_DATE_NOT_ALLOWED = "Can't add a past date as due for todo",
     TODO_DATA_NOT_FOUND = "No Todo data found to show",
+    TODO_NOT_FOUND = "No Todo Found with given Id",
+    UNAUTHORIZED_TODO_ACCESS = "You are only permitted to access your own todos.",
+
 
 } = {} as const
 

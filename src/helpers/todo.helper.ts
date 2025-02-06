@@ -1,9 +1,11 @@
 import { Types } from "mongoose";
 import { FunctionStatus } from "../enums";
 import { CompletedStatus } from "../enums/todo.enum";
-import { TodoFilterQuery } from "../types";
+import { TimeInHHMM, TodoFilterQuery, UpdateTodoArgs, UpdateTodoBody, YYYYMMDD } from "../types";
 import { logFunctionInfo } from "../utils";
-import { getDayRange } from "./date.helper";
+import { getDateFromStrings, getDayRange } from "./date.helper";
+import { errorMessage } from "../constants";
+import { IToDo } from "../interfaces";
 
 
 
@@ -35,4 +37,46 @@ export const getTodoFilter = (query: Omit<TodoFilterQuery, 'pageNo' | 'pageLimit
     }
 
     return matchFilter;
+}
+
+
+/**
+ * To update dateFeild with changing date and hours
+ */
+export const updateTodoDueAt = (dateFeild: Date, dateString?: YYYYMMDD, timeString?: TimeInHHMM): Date => {
+    logFunctionInfo(updateTodoDueAt.name, FunctionStatus.START);
+
+    if (dateString && timeString) {
+        return getDateFromStrings(dateString, timeString);
+    }
+
+    else if (dateString) {
+        const timeString = dateFeild.toString().split(' ')[4].slice(0, 5) as TimeInHHMM;
+        return getDateFromStrings(dateString, timeString);
+    }
+
+    else if (timeString) {
+        const dateString = dateFeild.toISOString().slice(0, 10) as YYYYMMDD;
+        return getDateFromStrings(dateString, timeString);
+    }
+
+    else throw new Error(errorMessage.UNWANTED_DATE_UPDATE)
+
+}
+
+
+/**
+ * To get feilds for update in proper format
+ */
+export const getTodoUpdateArgs = (updateBody: UpdateTodoBody, existingTodo: IToDo): UpdateTodoArgs => {
+    logFunctionInfo(getTodoUpdateArgs.name, FunctionStatus.START);
+
+    const { dueDate, dueTime, ...restTodoUpdateBody } = updateBody;
+
+    if (dueDate || dueTime) {
+        const dueAt = updateTodoDueAt(existingTodo.dueAt, dueDate, dueTime);
+        return { dueAt, ...restTodoUpdateBody }
+    }
+
+    return restTodoUpdateBody;
 }

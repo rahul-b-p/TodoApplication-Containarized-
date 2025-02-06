@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { roleAuth, validateReqBody, validateReqQuery } from "../middlewares";
-import { createTodoSchema, todoFilterSchema } from "../schemas";
+import { createTodoSchema, todoFilterSchema, updateTodoSchema } from "../schemas";
 import { todoController } from "../controllers";
 import { Roles } from "../enums";
 
@@ -17,3 +17,6 @@ router.post('/:userId', roleAuth(Roles.ADMIN), validateReqBody(createTodoSchema)
 
 // API to fetch all todos,Admin can view all, user can view thir own created todos
 router.get('/', validateReqQuery(todoFilterSchema), todoController.readAllTodos);
+
+// API to update todo, admn can update any, while user can only access their own todos
+router.put('/:id', validateReqBody(updateTodoSchema), todoController.updateTodo);

@@ -2,7 +2,7 @@ import { FunctionStatus, TodoSortArgs } from "../enums";
 import { getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpers";
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
-import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow } from "../types";
+import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
 import { getTodoSortArgs, logFunctionInfo } from "../utils";
 
 
@@ -145,5 +145,48 @@ export const fetchTodos = async (query: TodoFilterQuery): Promise<TodoFetchResul
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error.message);
+    }
+}
+
+
+/**
+ * To find todo using its unique id
+ */
+export const findTodoById = async (_id: string): Promise<IToDo | null> => {
+    const functionName = findTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const todo = await Todo.findById(_id);
+        delete (todo as any).__v;
+
+        if (todo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+
+        return todo;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error);
+    }
+}
+
+
+/**
+ * to update todo by its ubique id
+ */
+export const updateTodoById = async (_id: string, updateBody: UpdateTodoArgs): Promise<IToDo | null> => {
+    const functionName = updateTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const updatedTodo = await Todo.findByIdAndUpdate(_id, updateBody, { new: true }).lean();
+        if (!updatedTodo) return null;
+
+        delete (updatedTodo as any).__v;
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return updatedTodo;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error);
     }
 }

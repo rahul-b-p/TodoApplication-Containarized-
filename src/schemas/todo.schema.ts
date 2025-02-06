@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 import { dueDateSchema, dueTimeSchema } from "./date.schema";
 import { errorMessage } from "../constants";
 import { objectIdRegex } from "../config";
@@ -28,3 +28,23 @@ export const todoFilterSchema = z.object({
     dueAt: dueDateSchema.optional(),
     sortKey: z.nativeEnum(TodoSortKeys, { message: errorMessage.INVALID_SORT_KEY }).optional()
 }).strict();
+
+
+export const updateTodoSchema = z
+    .object({
+        title: titleSchema.optional(),
+        description: descriptionSchema.optional(),
+        dueDate: dueDateSchema.optional(),
+        dueTime: dueTimeSchema.optional(),
+        completed: z.boolean().optional().refine(value => value !== null, {
+            message: errorMessage.INVALID_COMPLETE_FIELD
+        }),
+    }).strict()
+    .superRefine((data, ctx) => {
+        if (data.completed == null && !data.description && !data.dueDate && !data.dueTime && !data.title) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessage.AT_LEAST_ONE_FIELD_REQUIRED_FOR_UPDATE,
+            });
+        }
+    });

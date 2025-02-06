@@ -2,11 +2,11 @@ import { NextFunction, Response } from "express";
 import { customRequestWithPayload } from "../interfaces";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
 import { DateStatus, FunctionStatus, Roles } from "../enums";
-import { InsertTodoArgs, TodoFilterQuery } from "../types";
+import { InsertTodoArgs, TodoFilterQuery, UpdateTodoBody } from "../types";
 import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
-import { fetchTodos, findUserById, insertTodo } from "../services";
-import { compareDatesWithCurrentDate, pagenate } from "../helpers";
+import { fetchTodos, findTodoById, findUserById, insertTodo, updateTodoById } from "../services";
+import { compareDatesWithCurrentDate, getTodoUpdateArgs, pagenate } from "../helpers";
 import { validateObjectId } from "../validators";
 
 
@@ -91,7 +91,7 @@ export const readAllTodos = async (req: customRequestWithPayload<{}, any, any, T
         const query = req.query;
 
         if (reqOwner.role !== Roles.ADMIN) {
-            if (query.createdBy) throw new ForbiddenError(errorMessage.INSUFFICIENT_PRIVILEGES);
+            if (query.createdBy) throw new ForbiddenError(errorMessage.UNAUTHORIZED_TODO_ACCESS);
 
             query.createdBy = reqOwnerId;
         }
@@ -109,6 +109,47 @@ export const readAllTodos = async (req: customRequestWithPayload<{}, any, any, T
         res.status(200).json({
             success: true, message, ...todoFetchResult, ...PageNationFeilds
         });
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller Function to update todo using its unique id
+ *  - Admin can update todos
+ *  - User can update their own todos
+ * @param id unique id of todo
+ */
+export const updateTodo = async (req: customRequestWithPayload<{ id: string }, any, UpdateTodoBody>, res: Response, next: NextFunction) => {
+    const functionName = updateTodo.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const reqOwnerId = req.payload?.id;
+        if (!reqOwnerId) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+        const reqOwner = await findUserById(reqOwnerId);
+        if (!reqOwner) throw new AuthenticationError();
+
+        const { id } = req.params;
+        const isValidId = validateObjectId(id);
+        if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
+
+        const existingTodo = await findTodoById(id);
+        if (!existingTodo) throw new NotFoundError(errorMessage.TODO_NOT_FOUND);
+
+        if (reqOwner.role !== Roles.ADMIN && existingTodo.createdBy.toString() !== reqOwnerId) {
+            throw new ForbiddenError(errorMessage.UNAUTHORIZED_TODO_ACCESS);
+        }
+
+        const todoUpdateArgs = getTodoUpdateArgs(req.body, existingTodo);
+
+        const updatedTodo = await updateTodoById(id, todoUpdateArgs);
+        if (!updateTodo) throw new InternalServerError(errorMessage.TODO_NOT_FOUND);
+
+        logFunctionInfo(functionName, FunctionStatus.START);
+        res.status(200).json(await sendCustomResponse(responseMessage.TODO_UPDATED, updatedTodo));
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

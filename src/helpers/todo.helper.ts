@@ -15,7 +15,7 @@ import { IToDo } from "../interfaces";
 export const getTodoFilter = (query: Omit<TodoFilterQuery, 'pageNo' | 'pageLimit'>): Record<string, any> => {
     logFunctionInfo(getTodoFilter.name, FunctionStatus.START);
     const { status, createdBy, dueAt, title } = query;
-    const matchFilter: Record<string, any> = {};
+    const matchFilter: Record<string, any> = { isDeleted: false };
     if (createdBy) {
         matchFilter.createdBy = new Types.ObjectId(createdBy);
     }

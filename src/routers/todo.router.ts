@@ -18,5 +18,8 @@ router.post('/:userId', roleAuth(Roles.ADMIN), validateReqBody(createTodoSchema)
 // API to fetch all todos,Admin can view all, user can view thir own created todos
 router.get('/', validateReqQuery(todoFilterSchema), todoController.readAllTodos);
 
-// API to update todo, admn can update any, while user can only access their own todos
+// API to update todo, Admin can update any, while user can only access their own todos
 router.put('/:id', validateReqBody(updateTodoSchema), todoController.updateTodo);
+
+// API to delete todo, Admin can delete any, while user can only access their own todos
+router.delete('/:id', todoController.deleteTodo);

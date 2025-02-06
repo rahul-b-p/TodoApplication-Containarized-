@@ -3,7 +3,7 @@ import { getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpe
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
 import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
-import { getTodoSortArgs, logFunctionInfo } from "../utils";
+import { getTodoSortArgs, logFunctionInfo, logger } from "../utils";
 
 
 
@@ -157,11 +157,9 @@ export const findTodoById = async (_id: string): Promise<IToDo | null> => {
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {
-        const todo = await Todo.findById(_id);
-        delete (todo as any).__v;
+        const todo = await Todo.findOne({ _id, isDeleted: false });
 
         if (todo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
-
         return todo;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
@@ -171,7 +169,7 @@ export const findTodoById = async (_id: string): Promise<IToDo | null> => {
 
 
 /**
- * to update todo by its ubique id
+ * to update todo by its unique id
  */
 export const updateTodoById = async (_id: string, updateBody: UpdateTodoArgs): Promise<IToDo | null> => {
     const functionName = updateTodoById.name;
@@ -185,6 +183,30 @@ export const updateTodoById = async (_id: string, updateBody: UpdateTodoArgs): P
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return updatedTodo;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error);
+    }
+}
+
+
+/**
+ * to update todo by its unique id
+ */
+export const softDeleteTodoById = async (_id: string): Promise<Date | undefined | null> => {
+    const functionName = softDeleteTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const softDeletedTodo = await Todo.findByIdAndUpdate(_id, {
+            isDeleted: true,
+            deletedAt: new Date()
+        }, { new: true });
+
+        if (!softDeletedTodo) return null;
+        
+        if (softDeletedTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return softDeletedTodo?.deletedAt;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error);

@@ -59,13 +59,6 @@ const todoSchema = new Schema<IToDo>(
 );
 
 
-todoSchema.pre('save', function (this: IToDo, next: () => void) {
-    if (this.isModified('isDeleted') && this.isDeleted) {
-        this.deletedAt = new Date();
-    }
-    next();
-});
-
 const Todo = mongoose.model<IToDo>('todos', todoSchema);
 
 export default Todo;

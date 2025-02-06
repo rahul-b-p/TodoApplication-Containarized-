@@ -5,7 +5,7 @@ import { DateStatus, FunctionStatus, Roles } from "../enums";
 import { InsertTodoArgs, TodoFilterQuery, UpdateTodoBody } from "../types";
 import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
-import { fetchTodos, findTodoById, findUserById, insertTodo, updateTodoById } from "../services";
+import { fetchTodos, findTodoById, findUserById, insertTodo, softDeleteTodoById, updateTodoById } from "../services";
 import { compareDatesWithCurrentDate, getTodoUpdateArgs, pagenate } from "../helpers";
 import { validateObjectId } from "../validators";
 
@@ -150,6 +150,45 @@ export const updateTodo = async (req: customRequestWithPayload<{ id: string }, a
 
         logFunctionInfo(functionName, FunctionStatus.START);
         res.status(200).json(await sendCustomResponse(responseMessage.TODO_UPDATED, updatedTodo));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller Function to soft delete todo using its unique id
+ *  - Admin can delete todos
+ *  - User can delete their own todos
+ * @param id unique id of todo
+ */
+export const deleteTodo = async (req: customRequestWithPayload<{ id: string }>, res: Response, next: NextFunction) => {
+    const functionName = deleteTodo.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const reqOwnerId = req.payload?.id;
+        if (!reqOwnerId) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+        const reqOwner = await findUserById(reqOwnerId);
+        if (!reqOwner) throw new AuthenticationError();
+
+        const { id } = req.params;
+        const isValidId = validateObjectId(id);
+        if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
+
+        const existingTodo = await findTodoById(id);
+        if (!existingTodo) throw new NotFoundError(errorMessage.TODO_NOT_FOUND);
+
+        if (reqOwner.role !== Roles.ADMIN && existingTodo.createdBy.toString() !== reqOwnerId) {
+            throw new ForbiddenError(errorMessage.UNAUTHORIZED_TODO_ACCESS);
+        }
+
+        const deletedAt = await softDeleteTodoById(id);
+        if (!deletedAt) throw new InternalServerError(errorMessage.TODO_NOT_FOUND);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json({ ...await sendCustomResponse(responseMessage.TODO_DELETED), deletedAt });
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

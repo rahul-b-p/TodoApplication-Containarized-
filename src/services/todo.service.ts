@@ -7,7 +7,9 @@ import { logFunctionInfo } from "../utils";
 
 
 
-
+/**
+ * TO insert a new todo
+*/
 export const insertTodo = async (createdBy: string, todoToInsert: InsertTodoArgs): Promise<IToDo> => {
     const functionName = insertTodo.name;
     logFunctionInfo(functionName, FunctionStatus.START);

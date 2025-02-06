@@ -1,6 +1,6 @@
 import { DateStatus, FunctionStatus } from "../enums";
 import { DateRange, TimeInHHMM, YYYYMMDD } from "../types";
-import { logFunctionInfo, logger } from "../utils";
+import { logFunctionInfo } from "../utils";
 import { errorMessage } from "../constants";
 
 

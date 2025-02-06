@@ -1,5 +1,5 @@
 import { responseMessage } from "../constants";
-import { UserUpdateArgs, UserUpdateBody, UserUpdateRequirments } from "../types";
+import { UserUpdateBody, UserUpdateRequirments } from "../types";
 
 
 

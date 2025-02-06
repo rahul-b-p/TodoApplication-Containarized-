@@ -3,7 +3,7 @@ import { getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpe
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
 import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow } from "../types";
-import { getTodoSortArgs, logFunctionInfo, logger } from "../utils";
+import { getTodoSortArgs, logFunctionInfo } from "../utils";
 
 
 
@@ -129,7 +129,6 @@ export const fetchTodos = async (query: TodoFilterQuery): Promise<TodoFetchResul
         const { page, limit, skip } = getPaginationParams(pageNo, pageLimit);
         const sort = getTodoSortArgs(sortKey);
 
-        logger.info(matchFilter);
         const totalItems = await getTodoFilterCount(matchFilter)
 
         const allTodos: TodoToShow[] = await filterTodos(matchFilter, sort, skip, limit)

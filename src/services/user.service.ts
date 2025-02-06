@@ -1,5 +1,5 @@
 import { FunctionStatus, Roles, UserSortArgs } from "../enums";
-import { calculatePageSkip } from "../helpers";
+import { getPaginationParams } from "../helpers";
 import { IUser } from "../interfaces";
 import { User } from "../models";
 import { IUserData, UserFetchResult, UserFilterQuery, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
@@ -190,7 +190,7 @@ export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResul
 
         const matchFilter: Record<string, any> = {};
         if (role) {
-            matchFilter.role = role
+            matchFilter.role = role;
         }
         if (username) {
             matchFilter.username = { $regex: username, $options: "i" };
@@ -198,9 +198,7 @@ export const fetchUsers = async (query: UserFilterQuery): Promise<UserFetchResul
 
         const sort: UserSortArgs = getUserSortArgs(sortKey);
 
-        const page = Number(pageNo);
-        const limit = Number(pageLimit)
-        const skip = calculatePageSkip(page, limit);
+        const { limit, page, skip } = getPaginationParams(pageNo, pageLimit);
 
         const totalItems = await getUserFilterCount(matchFilter);
 

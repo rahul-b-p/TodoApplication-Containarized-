@@ -18,9 +18,9 @@ const todoSchema = new Schema<IToDo>(
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'User',
+            ref: 'users',
         },
-        dueDate: {
+        dueAt: {
             type: Date,
             required: true,
         },

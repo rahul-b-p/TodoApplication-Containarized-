@@ -4,7 +4,7 @@ import { createDefultAdmin, logger } from './utils';
 import { morganLogger } from './config';
 import { connectMongoDB } from './database';
 import { accessTokenAuth, ErrorHandler } from './middlewares';
-import { authRouter, profileRouter, userRouter } from './routers';
+import { authRouter, profileRouter, todoRouter, userRouter } from './routers';
 
 
 const app = express();
@@ -33,7 +33,7 @@ const InitializeApp = async () => {
         app.use('/auth', authRouter);
         app.use('/me', accessTokenAuth, profileRouter);
         app.use('/user', accessTokenAuth, userRouter);
-
+        app.use('/todo', accessTokenAuth, todoRouter);
 
         // Using error request handler
         app.use(ErrorHandler);

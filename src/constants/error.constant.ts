@@ -39,7 +39,16 @@ export const {
     PAGE_NUMBER_MUST_BE_DIGITS = "Page number must be provided in digits.",
     PAGE_LIMIT_MUST_BE_DIGITS = "Page limit must be provided in digits.",
     INVALID_ID = "Invalid Unique Id",
-
+    DUE_TIME_REQUIRED = "Due time for todo is required",
+    INVALID_DUE_TIME = "Time is in Invalid  Format, should be as HH:MM",
+    INVALID_DATE_FORMAT = "Date is in Invalid Formay, should be in YYYY-MM-DD format.",
+    DUE_DATE_REQUIRED = 'Due date is required',
+    INVALID_DATE = "Invalid date",
+    TITLE_REQUIRED = "Title is required and should be in string",
+    TITLE_MIN_LENGTH = "Invalid title, Atleast five charactes",
+    DESC_REQUIRED = "Description, required, asnd should be string",
+    DESC_MIN_LENGTH = "Invalid description, At least five characters",
+    DESC_MAX_LENGTH = "Invalid description. It should not exceed 200 characters.",
     // User
     EMAIL_ALREADY_EXISTS = "User Already Exists with given Email ID",
     USER_NOT_FOUND = "No User Found with given data",
@@ -56,6 +65,8 @@ export const {
     INVALID_OTP = "Email verification failed. Invalid OTP.",
     INSUFFICIENT_PRIVILEGES = "Forbidden: Insufficient role privileges.",
 
+    // Todo
+    PAST_DATE_NOT_ALLOWED = "Can't add a past date as due for todo",
 
 } = {} as const
 

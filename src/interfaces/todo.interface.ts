@@ -6,7 +6,7 @@ export interface IToDo extends Document {
     title: string;
     description: string;
     createdBy: Types.ObjectId;
-    dueDate: Date;
+    dueAt: Date;
     completed: boolean;
     isDeleted: boolean;
     createdAt: Date;

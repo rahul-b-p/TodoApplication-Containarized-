@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { profileController } from "../controllers";
-import { validateReqBody } from "../middlewares";
-import { userUpdateSchema } from "../schemas";
+import { validateReqBody, validateReqQuery } from "../middlewares";
+import { accountDeletionQuerySchema, userUpdateSchema } from "../schemas";
 
 
 
@@ -13,3 +13,9 @@ router.get('/', profileController.readMyProfile);
 
 // API to update profile
 router.put('/', validateReqBody(userUpdateSchema), profileController.updateProfile);
+
+//API to request verification otp for account deletion
+router.post('/delete', profileController.profileDeleteRequest);
+
+// API to delete account by otp verification
+router.delete('/', validateReqQuery(accountDeletionQuerySchema), profileController.verifyAndDeleteProfile);

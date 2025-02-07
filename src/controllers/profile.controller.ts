@@ -4,7 +4,7 @@ import { AuthenticationError, BadRequestError, ConflictError, ForbiddenError, In
 import { errorMessage, responseMessage } from "../constants";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
 import { FunctionStatus, Roles } from "../enums";
-import { findUserById, findUserDatasById, sendUserUpdationNotification, updateUserById } from "../services";
+import { deleteUserById, findUserById, findUserDatasById, saveOtp, sendOtpForAccountDeletion, sendUserUpdationNotification, updateUserById, verifyOtp } from "../services";
 import { UserUpdateArgs, UserUpdateBody } from "../types";
 import { checkEmailValidity, validateEmailUniqueness } from "../validators";
 
@@ -31,6 +31,7 @@ export const readMyProfile = async (req: customRequestWithPayload, res: Response
         next(error);
     }
 }
+
 
 /**
  * Controller function to allow a logged-in user to update their own account details.
@@ -83,6 +84,68 @@ export const updateProfile = async (req: customRequestWithPayload<{}, any, UserU
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json({ ...await sendCustomResponse(message, updatedUser), verifyLink: email ? '/auth/login' : undefined });
     } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller functions to request OTP for deleting account
+ */
+export const profileDeleteRequest = async (req: customRequestWithPayload, res: Response, next: NextFunction) => {
+    const functionName = profileDeleteRequest.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const id = req.payload?.id;
+        if (!id) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+
+        const userData = await findUserById(id);
+        if (!userData) throw new AuthenticationError();
+
+        const { mailInfo, otp } = await sendOtpForAccountDeletion(userData.email);
+        logger.info(mailInfo);
+        if (mailInfo.accepted.length <= 0) throw new Error(errorMessage.EMAIL_VALIDATION_FAILED);
+
+        await saveOtp(otp, userData._id.toString());
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json({
+            message: responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION,
+            emailSent: true
+        });
+    } catch (error) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL);
+        next(error);
+    }
+}
+
+
+/**
+ * Controller Function to verify and delete profile by validating otp
+ */
+export const verifyAndDeleteProfile = async (req: customRequestWithPayload<{}, any, any, { otp: string }>, res: Response, next: NextFunction) => {
+    const functionName = verifyAndDeleteProfile.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const id = req.payload?.id;
+        if (!id) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+
+        const userData = await findUserById(id);
+        if (!userData) throw new AuthenticationError();
+
+        const { otp } = req.query;
+        const isValidOtp = await verifyOtp(id, otp);
+        if (!isValidOtp) throw new AuthenticationError(errorMessage.INVALID_OTP);
+
+        const isDeleted = await deleteUserById(id);
+        if (!isDeleted) throw new InternalServerError(errorMessage.USER_NOT_FOUND);
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json(await sendCustomResponse(responseMessage.ACCOUNT_DELETED));
+    } catch (error) {
         logFunctionInfo(functionName, FunctionStatus.FAIL);
         next(error);
     }

@@ -1,7 +1,8 @@
 import morgan from "morgan";
-import { logger } from "../utils";
+import { winstonLogger } from "./winston.config";
 
 
+// configuring morgan logger with winston logger
 
-const stream = { write: (message: any) => logger.info(message.trim()) }
+const stream = { write: (message: any) => winstonLogger.info(message.trim()) }
 export const morganLogger = morgan("dev", { stream });

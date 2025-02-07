@@ -1,8 +1,6 @@
-
-
-
-
 export const {
+
+
     //auth
     SUCCESS_LOGIN = "Logged in successfully.",
     TOKEN_REFRESHED = "Token has been refreshed successfully.",
@@ -12,15 +10,22 @@ export const {
     SUCCESS_SIGNUP = "Signup completed successfully.",
     EMAIL_VERIFICATION_REQUIRED = "Email verification is needed.",
 
+
+
     // ME
-    PROFILE_UPDATED = 'Your profile has been updated',
-    PROFILE_FETCHED = 'Your Profile Data has been Fetched Successfully',
+    PROFILE_UPDATED = "Your profile has been updated",
+    PROFILE_FETCHED = "Your Profile Data has been Fetched Successfully",
+    ACCOUNT_DELETED = "Your Account has been deleted successfully",
+
+
 
     // USER
     USER_CREATED = "New User Created Successfully",
     USER_DATA_FETCHED = "User data fetched successfully",
     USER_UPDATED = "User Updated Successfully",
     USER_DELETED = "User Deleted Successfully",
+
+
 
     // ToDo
     TODO_CREATED = "New Todo Created Successfully",

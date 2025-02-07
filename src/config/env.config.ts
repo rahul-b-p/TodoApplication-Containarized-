@@ -19,7 +19,7 @@ const requiredEnvVariables: string[] = [
     'HOST_EMAIL_PASSKEY'
 ];
 
-
+// Throwing application error, to exist from process when env variables are not assigned
 requiredEnvVariables.forEach((envVar) => {
     if (!process.env[envVar]) {
         const { ENV_ACKNOWLEDGE, REQUIRED_ENV_MISSING } = errorMessage;
@@ -31,6 +31,8 @@ requiredEnvVariables.forEach((envVar) => {
     }
 });
 
+
+// exporting all env variables
 export const MONGODB_URI = process.env.MONGODB_URI as string;
 
 export const HASH_SALT_ROUNDS = process.env.HASH_SALT_ROUNDS as string;

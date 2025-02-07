@@ -1,5 +1,7 @@
 import winston from "winston";
 
+// winston logger configuration
+
 export const winstonLogger = winston.createLogger({
     format: winston.format.combine(
         winston.format.colorize(),

@@ -2,8 +2,8 @@ import { FetchType, FunctionStatus, TodoSortArgs } from "../enums";
 import { convertTodoToShow, getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpers";
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
-import { InsertTodoArgs, PageFilter, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
-import { getTodoSortArgs, logFunctionInfo, logger } from "../utils";
+import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
+import { getTodoSortArgs, logFunctionInfo } from "../utils";
 
 
 
@@ -105,7 +105,6 @@ export const filterTodos = async (matchFilter: Record<string, any>, sort: TodoSo
                     createdAt: 1,
                     updatedAt: 1,
                     completed: 1,
-                    isDeleted: 1
                 },
             },
         ]);
@@ -267,6 +266,7 @@ export const restoreSoftDeletedTodoById = async (_id: string): Promise<IToDo | n
         throw new Error(error);
     }
 }
+
 
 /**
  * To delete todo permently,by its unique id

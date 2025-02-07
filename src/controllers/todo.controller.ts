@@ -275,7 +275,8 @@ export const readTrashTodos = async (req: customRequestWithPayload<{}, any, any,
 }
 
 
-/**Controller Function to restore trash todo 
+/**
+ * Controller Function to restore trash todo 
  *  - Admin can restore any trash todos
  *  - User can restore  their trash todos
  * @param id unique id of todo

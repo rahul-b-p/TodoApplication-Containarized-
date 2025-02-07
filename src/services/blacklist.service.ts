@@ -2,7 +2,7 @@ import { FunctionStatus } from "../enums";
 import { IBlackList } from "../interfaces";
 import { TokenPayload } from "../jwt";
 import { Blacklist } from "../models";
-import { logFunctionInfo, logger } from "../utils";
+import { logFunctionInfo } from "../utils";
 import jwt from 'jsonwebtoken';
 
 

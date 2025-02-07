@@ -1,8 +1,8 @@
-import { Types } from "mongoose";
+import { startSession, Types } from "mongoose";
 import { FunctionStatus, Roles, UserSortArgs } from "../enums";
 import { getPaginationParams } from "../helpers";
 import { IUser } from "../interfaces";
-import { User } from "../models";
+import { Todo, User } from "../models";
 import { IUserData, UserFetchResult, UserFilterQuery, UserInsertArgs, UserToShow, UserUpdateArgs } from "../types";
 import { getUserSortArgs, hashPassword, logFunctionInfo } from "../utils";
 
@@ -269,12 +269,22 @@ export const deleteUserById = async (_id: string): Promise<boolean> => {
     const functionName = deleteUserById.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
+    const session = await startSession();
+    session.startTransaction();
     try {
         const deletedUser = await User.findByIdAndDelete(_id);
 
-        if (!deletedUser) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        await Todo.deleteMany({ createdBy: _id });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (deletedUser) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return deletedUser !== null;
     } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error.message);
     }

@@ -1,4 +1,4 @@
-import { UserSortArgs, UserSortKeys } from "../enums";
+import { TodoSortArgs, TodoSortKeys, UserSortArgs, UserSortKeys } from "../enums";
 
 
 /**
@@ -11,4 +11,17 @@ export const getUserSortArgs = (sortKey?: UserSortKeys): UserSortArgs => {
     };
 
     return sortMapping[sortKey as UserSortKeys] || UserSortArgs.createAt;
+};
+
+
+/**
+ * Maps todo sort arguments from sort keys
+ */
+export const getTodoSortArgs = (sortKey?: TodoSortKeys): TodoSortArgs => {
+    const sortMapping: Record<TodoSortKeys, TodoSortArgs> = {
+        [TodoSortKeys.TITLE]: TodoSortArgs.TITLE,
+        [TodoSortKeys.CREATE_AT]: TodoSortArgs.CREATE_AT,
+    };
+
+    return sortMapping[sortKey as TodoSortKeys] || TodoSortArgs.CREATE_AT;
 };

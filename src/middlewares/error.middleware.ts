@@ -1,19 +1,20 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { CustomError, InternalServerError } from "../errors";
 import { ZodError } from "zod";
-import { logger } from "../utils";
+import { logger, sendCustomResponse } from "../utils";
 import { errorMessage } from "../constants";
 
 
 /**
  * Middleware function to handle Errors
 */
-export const ErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const ErrorHandler: ErrorRequestHandler = async (err: Error, req: Request, res: Response, next: NextFunction) => {
 
     if (err instanceof CustomError) {
         if (err instanceof InternalServerError) {
             logger.error(`Application Error: ${err.message}`);
-            res.status(err.statusCode).json(err.serialize())
+            res.status(err.statusCode).json(await sendCustomResponse(errorMessage.SERVER_ISSUE, undefined, false));
+            return;
         }
         logger.warn(errorMessage.REQUEST_FAILED);
         res.status(err.statusCode).json(err.serialize());

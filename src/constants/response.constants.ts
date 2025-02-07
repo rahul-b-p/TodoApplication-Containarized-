@@ -17,9 +17,15 @@ export const {
     PROFILE_FETCHED = 'Your Profile Data has been Fetched Successfully',
 
     // USER
-    USER_CREATED ="New User Created Successfully",
-    USER_DATA_FETCHED="User data fetched successfully",
-    USER_UPDATED="User Updated Successfully",
-    USER_DELETED="User Deleted Successfully"
+    USER_CREATED = "New User Created Successfully",
+    USER_DATA_FETCHED = "User data fetched successfully",
+    USER_UPDATED = "User Updated Successfully",
+    USER_DELETED = "User Deleted Successfully",
+
+    // ToDo
+    TODO_CREATED = "New Todo Created Successfully",
+    TODO_DATA_FETCHED = "Todo data fetched successfully",
+    TODO_UPDATED = "Todo Updated Successfully",
+    TODO_DELETED = "Todo Deleted Successfully",
 
 } = {} as const;

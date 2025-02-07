@@ -1,5 +1,5 @@
 import { FunctionStatus } from "../enums";
-import { PageInfo, PageNationFeilds } from "../types";
+import { PageInfo, PageNationFeilds, PaginationParams } from "../types";
 import { logFunctionInfo } from "../utils/logger";
 
 
@@ -38,8 +38,14 @@ export const pagenate = (pageInfo: PageInfo, url: string): PageNationFeilds => {
 }
 
 /**
- * Calculate the number of documents to skip for pagination.
+ * To get the page nation required params like page,limit and skip.
  */
-export const calculatePageSkip = (page: number, limit: number): number => {
-    return (page - 1) * limit;
+export const getPaginationParams = (pageNo: string, pageLimit: string): PaginationParams => {
+    const page = Number(pageNo);
+    const limit = Number(pageLimit);
+    const skip = (page - 1) * limit;
+
+    return {
+        page, limit, skip
+    }
 };

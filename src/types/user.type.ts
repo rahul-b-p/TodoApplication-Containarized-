@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Roles, UserSortKeys } from "../enums";
 import { IUser } from "../interfaces";
-import { PageInfo } from "./page.type";
+import { PageFilter, PageInfo } from "./page.type";
 import { boolean } from "zod";
 
 
@@ -49,9 +49,7 @@ export type UserUpdateBody = Partial<Omit<UserInsertArgs, 'password'>> & {
     verified?: boolean
 };
 
-export type UserFilterQuery = {
-    pageNo: string;
-    pageLimit: string;
+export type UserFilterQuery = PageFilter & {
     role?: Roles;
     sortKey?: UserSortKeys;
     username?: string;

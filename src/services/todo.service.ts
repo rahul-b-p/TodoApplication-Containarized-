@@ -152,12 +152,20 @@ export const fetchTodos = async (fetchType: FetchType, query: TodoFilterQuery): 
 /**
  * To find todo using its unique id
  */
-export const findTodoById = async (_id: string): Promise<IToDo | null> => {
+export const findTodoById = async (fetchType: FetchType, _id: string): Promise<IToDo | null> => {
     const functionName = findTodoById.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {
-        const todo = await Todo.findOne({ _id, isDeleted: false });
+        const query: Record<string, any> = { _id };
+        if (fetchType == FetchType.ACTIVE) {
+            query.isDeleted = false;
+        }
+        if (fetchType == FetchType.TRASH) {
+            query.isDeleted = true;
+        }
+
+        const todo = await Todo.findOne(query);
 
         if (todo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return todo;
@@ -234,5 +242,27 @@ export const fetchTodoDataById = async (_id: string): Promise<TodoToShow | null>
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error.message);
+    }
+}
+
+/**
+ * To restore soft deleted todo using its unique id
+ */
+export const restoreSoftDeletedTodoById = async (_id: string): Promise<IToDo | null> => {
+    const functionName = softDeleteTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const restoredTodo = await Todo.findByIdAndUpdate(_id, {
+            $set: { isDeleted: false },
+            $unset: { deletedAt: 1 }
+        }, { new: true }).lean();
+
+        delete (restoredTodo as any).__v;
+        if (restoredTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return restoredTodo;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error);
     }
 }

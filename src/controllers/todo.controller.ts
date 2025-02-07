@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { customRequestWithPayload } from "../interfaces";
-import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
+import { logFunctionInfo, sendCustomResponse } from "../utils";
 import { DateStatus, FetchType, FunctionStatus, Roles } from "../enums";
 import { InsertTodoArgs, TodoFilterQuery, UpdateTodoBody } from "../types";
 import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
@@ -26,7 +26,6 @@ export const createTodo = async (req: customRequestWithPayload<{}, any, InsertTo
 
         const { dueDate } = req.body;
         const dateStatus = compareDatesWithCurrentDate(dueDate);
-        logger.info(dateStatus)
         if (dateStatus == DateStatus.Past) throw new BadRequestError(errorMessage.PAST_DATE_NOT_ALLOWED);
 
         const insertedTodo = await insertTodo(userId, req.body);
@@ -59,7 +58,6 @@ export const createUserTodo = async (req: customRequestWithPayload<{ userId: str
 
         const { dueDate } = req.body;
         const dateStatus = compareDatesWithCurrentDate(dueDate);
-        logger.info(dateStatus)
         if (dateStatus == DateStatus.Past) throw new BadRequestError(errorMessage.PAST_DATE_NOT_ALLOWED);
 
         const insertedTodo = await insertTodo(userId, req.body);
@@ -296,7 +294,6 @@ export const restoreTodo = async (req: customRequestWithPayload<{ id: string }>,
         if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
 
         const existingTrashTodo = await findTodoById(FetchType.TRASH, id);
-        logger.info(existingTrashTodo)
         if (!existingTrashTodo) throw new NotFoundError(errorMessage.TODO_NOT_FOUND_IN_TRASH);
 
         if (reqOwner.role !== Roles.ADMIN && existingTrashTodo.createdBy.toString() !== reqOwnerId) {
@@ -337,7 +334,6 @@ export const deleteTrashTodo = async (req: customRequestWithPayload<{ id: string
         if (!isValidId) throw new BadRequestError(errorMessage.INVALID_ID);
 
         const existingTrashTodo = await findTodoById(FetchType.TRASH, id);
-        logger.info(existingTrashTodo)
         if (!existingTrashTodo) throw new NotFoundError(errorMessage.TODO_NOT_FOUND_IN_TRASH);
 
         if (reqOwner.role !== Roles.ADMIN && existingTrashTodo.createdBy.toString() !== reqOwnerId) {

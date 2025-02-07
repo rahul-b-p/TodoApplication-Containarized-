@@ -276,7 +276,7 @@ export const deleteTodoById = async (_id: string): Promise<boolean> => {
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {
-        const deleteTodo = await Todo.findByIdAndUpdate(_id);
+        const deleteTodo = await Todo.findByIdAndDelete(_id);
 
         if (deleteTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return deleteTodo !== null;

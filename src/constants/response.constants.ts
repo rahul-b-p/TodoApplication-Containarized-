@@ -28,6 +28,7 @@ export const {
     TODO_UPDATED = "Todo Updated Successfully",
     TODO_DELETED = "Todo Deleted Successfully",
     TRASH_TOD0_FETCHED = "Todo Datas in trash has been fetched successfully",
-    RESTORED_TODO = "Todo Restored successfully"
+    RESTORED_TODO = "Todo Restored successfully",
+    TRAH_TODO_DELETED = "Todo data permenantly deleted from trash"
 
 } = {} as const;

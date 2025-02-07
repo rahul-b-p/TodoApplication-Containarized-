@@ -28,7 +28,10 @@ router.delete('/:id', todoController.deleteTodo);
 router.get('/:id', todoController.readTodoById);
 
 // API to fetch Trashed Todos,Admin can view all trash, user can view thir own trash todos
-router.get('/trash/get', validateReqQuery(todoFilterSchema), todoController.readTrashTodos);
+router.get('/trash/all', validateReqQuery(todoFilterSchema), todoController.readTrashTodos);
 
 // API to restore Trashed Todod, Admin can restore any, while user can restore their own
 router.patch('/trash/:id', todoController.restoreTodo);
+
+//API to delete todo permenantly from trash
+router.delete('/trash/:id', todoController.deleteTrashTodo);

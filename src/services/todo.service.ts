@@ -245,6 +245,7 @@ export const fetchTodoDataById = async (_id: string): Promise<TodoToShow | null>
     }
 }
 
+
 /**
  * To restore soft deleted todo using its unique id
  */
@@ -261,6 +262,24 @@ export const restoreSoftDeletedTodoById = async (_id: string): Promise<IToDo | n
         delete (restoredTodo as any).__v;
         if (restoredTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         return restoredTodo;
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        throw new Error(error);
+    }
+}
+
+/**
+ * To delete todo permently,by its unique id
+ */
+export const deleteTodoById = async (_id: string): Promise<boolean> => {
+    const functionName = deleteTodoById.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const deleteTodo = await Todo.findByIdAndUpdate(_id);
+
+        if (deleteTodo) logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        return deleteTodo !== null;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error);

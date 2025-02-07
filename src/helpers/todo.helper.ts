@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { FunctionStatus } from "../enums";
+import { FetchType, FunctionStatus } from "../enums";
 import { CompletedStatus } from "../enums/todo.enum";
 import { TimeInHHMM, TodoFilterQuery, TodoToShow, UpdateTodoArgs, UpdateTodoBody, YYYYMMDD } from "../types";
 import { logFunctionInfo } from "../utils";
@@ -12,10 +12,20 @@ import { IToDo } from "../interfaces";
 /**
  * To get filter to use in match aggregation pipline in Todo 
  */
-export const getTodoFilter = (query: Omit<TodoFilterQuery, 'pageNo' | 'pageLimit'>): Record<string, any> => {
+export const getTodoFilter = (fetchType: FetchType, query: Omit<TodoFilterQuery, 'pageNo' | 'pageLimit'>): Record<string, any> => {
     logFunctionInfo(getTodoFilter.name, FunctionStatus.START);
     const { status, createdBy, dueAt, title } = query;
-    const matchFilter: Record<string, any> = { isDeleted: false };
+    let matchFilter: Record<string, any> = {};
+
+
+    if (fetchType == FetchType.ACTIVE) {
+        matchFilter.isDeleted = false;
+    }
+
+    if (fetchType == FetchType.TRASH) {
+        matchFilter.isDeleted = true;
+    }
+
     if (createdBy) {
         matchFilter.createdBy = new Types.ObjectId(createdBy);
     }

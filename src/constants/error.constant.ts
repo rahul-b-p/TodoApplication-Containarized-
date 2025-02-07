@@ -74,7 +74,7 @@ export const {
     TODO_DATA_NOT_FOUND = "No Todo data found to show",
     TODO_NOT_FOUND = "No Todo Found with given Id",
     UNAUTHORIZED_TODO_ACCESS = "You are only permitted to access your own todos.",
-
+    EMPTY_TRASH = "Your trash is empty, No Data to fetch"
 
 } = {} as const
 

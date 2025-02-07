@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { customRequestWithPayload } from "../interfaces";
 import { logFunctionInfo, logger, sendCustomResponse } from "../utils";
-import { DateStatus, FunctionStatus, Roles } from "../enums";
+import { DateStatus, FetchType, FunctionStatus, Roles } from "../enums";
 import { InsertTodoArgs, TodoFilterQuery, UpdateTodoBody } from "../types";
 import { AuthenticationError, BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../errors";
 import { errorMessage, responseMessage } from "../constants";
@@ -96,7 +96,7 @@ export const readAllTodos = async (req: customRequestWithPayload<{}, any, any, T
             query.createdBy = reqOwnerId;
         }
 
-        const todoFetchResult = await fetchTodos(query);
+        const todoFetchResult = await fetchTodos(FetchType.ACTIVE, query);
         const message = todoFetchResult ? responseMessage.TODO_DATA_FETCHED : errorMessage.TODO_DATA_NOT_FOUND;
 
         let PageNationFeilds;
@@ -225,6 +225,46 @@ export const readTodoById = async (req: customRequestWithPayload<{ id: string }>
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json(await sendCustomResponse(responseMessage.TODO_DATA_FETCHED, existingTodo));
+    } catch (error: any) {
+        logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
+        next(error);
+    }
+}
+
+/**
+ * Controller function to fetch the trash (soft deleted todos)
+ */
+export const readTrashTodos = async (req: customRequestWithPayload<{}, any, any, TodoFilterQuery>, res: Response, next: NextFunction) => {
+    const functionName = readTrashTodos.name;
+    logFunctionInfo(functionName, FunctionStatus.START);
+
+    try {
+        const reqOwnerId = req.payload?.id;
+        if (!reqOwnerId) throw new InternalServerError(errorMessage.NO_USER_ID_IN_PAYLOAD);
+        const reqOwner = await findUserById(reqOwnerId);
+        if (!reqOwner) throw new AuthenticationError();
+
+        const query = req.query;
+
+        if (reqOwner.role !== Roles.ADMIN) {
+            if (query.createdBy) throw new ForbiddenError(errorMessage.UNAUTHORIZED_TODO_ACCESS);
+
+            query.createdBy = reqOwnerId;
+        }
+
+        const todoFetchResult = await fetchTodos(FetchType.TRASH, query);
+        const message = todoFetchResult ? responseMessage.TRASH_TOD0_FETCHED : errorMessage.EMPTY_TRASH;
+
+        let PageNationFeilds;
+        if (todoFetchResult) {
+            const { data, ...pageInfo } = todoFetchResult
+            PageNationFeilds = pagenate(pageInfo, req.originalUrl);
+        }
+
+        logFunctionInfo(functionName, FunctionStatus.SUCCESS);
+        res.status(200).json({
+            success: true, message, ...todoFetchResult, ...PageNationFeilds
+        });
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         next(error);

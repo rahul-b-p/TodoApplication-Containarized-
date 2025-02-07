@@ -26,3 +26,6 @@ router.delete('/:id', todoController.deleteTodo);
 
 // API to find Todo by its unique id, Admin can fetch any, while user can only access their own todos
 router.get('/:id', todoController.readTodoById);
+
+// API to fetch Trashed Todos,Admin can view all trash, user can view thir own trash todos
+router.get('/trash', validateReqQuery(todoFilterSchema), todoController.readTrashTodos);

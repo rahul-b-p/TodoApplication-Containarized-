@@ -1,9 +1,9 @@
-import { FunctionStatus, TodoSortArgs } from "../enums";
+import { FetchType, FunctionStatus, TodoSortArgs } from "../enums";
 import { convertTodoToShow, getDateFromStrings, getPaginationParams, getTodoFilter } from "../helpers";
 import { IToDo } from "../interfaces";
 import { Todo } from "../models";
-import { InsertTodoArgs, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
-import { getTodoSortArgs, logFunctionInfo } from "../utils";
+import { InsertTodoArgs, PageFilter, TodoFetchResult, TodoFilterQuery, TodoToShow, UpdateTodoArgs } from "../types";
+import { getTodoSortArgs, logFunctionInfo, logger } from "../utils";
 
 
 
@@ -105,6 +105,7 @@ export const filterTodos = async (matchFilter: Record<string, any>, sort: TodoSo
                     createdAt: 1,
                     updatedAt: 1,
                     completed: 1,
+                    isDeleted: 1
                 },
             },
         ]);
@@ -117,14 +118,14 @@ export const filterTodos = async (matchFilter: Record<string, any>, sort: TodoSo
 /**
  * To fetch todos with serach, filter, sort and pagenation
  */
-export const fetchTodos = async (query: TodoFilterQuery): Promise<TodoFetchResult | null> => {
+export const fetchTodos = async (fetchType: FetchType, query: TodoFilterQuery): Promise<TodoFetchResult | null> => {
     const functionName = fetchTodos.name;
     logFunctionInfo(functionName, FunctionStatus.START);
 
     try {
         const { sortKey, pageLimit, pageNo, ...matchQuery } = query;
 
-        const matchFilter = getTodoFilter(matchQuery);
+        const matchFilter = getTodoFilter(fetchType, matchQuery);
         const { page, limit, skip } = getPaginationParams(pageNo, pageLimit);
         const sort = getTodoSortArgs(sortKey);
 

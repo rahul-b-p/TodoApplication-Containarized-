@@ -32,7 +32,7 @@ export const login = async (req: Request<{}, any, UserAuthBody>, res: Response, 
             logger.info(mailInfo);
             if (mailInfo.accepted.length <= 0) throw new Error(errorMessage.EMAIL_VALIDATION_FAILED);
 
-            saveOtp(otp, existingUser._id.toString());
+            await saveOtp(otp, existingUser._id.toString());
             logFunctionInfo(functionName, FunctionStatus.PENDING, responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION);
             res.status(200).json({
                 message: responseMessage.OTP_SENT_FOR_EMAIL_VERIFICATION,
@@ -182,7 +182,7 @@ export const forgotPassword = async (req: Request<{}, any, { email: string }>, r
         logger.info(mailInfo);
         if (mailInfo.accepted.length <= 0) throw new Error(errorMessage.EMAIL_VALIDATION_FAILED);
 
-        saveOtp(otp, existingUser._id.toString());
+        await saveOtp(otp, existingUser._id.toString());
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
         res.status(200).json({

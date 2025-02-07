@@ -13,8 +13,9 @@ export const {
     EMAIL_VERIFICATION_REQUIRED = "Email verification is needed.",
 
     // ME
-    PROFILE_UPDATED = 'Your profile has been updated',
-    PROFILE_FETCHED = 'Your Profile Data has been Fetched Successfully',
+    PROFILE_UPDATED = "Your profile has been updated",
+    PROFILE_FETCHED = "Your Profile Data has been Fetched Successfully",
+    ACCOUNT_DELETED = "Your Account has been deleted successfully",
 
     // USER
     USER_CREATED = "New User Created Successfully",

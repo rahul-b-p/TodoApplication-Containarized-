@@ -67,12 +67,15 @@ export const userUpdateSchema = z.object({
     );
 
 
+export const userFilterQuerySchema = z.object({
+    pageNo: pageNoSchema,
+    pageLimit: pageLimitSchema,
+    role: z.string().optional(),
+    sortKey: z.nativeEnum(UserSortKeys, { message: errorMessage.INVALID_SORT_KEY }).optional(),
+    username: z.string().optional()
+}).strict();
 
-export const userFilterQuerySchema = z
-    .object({
-        pageNo: pageNoSchema,
-        pageLimit: pageLimitSchema,
-        role: z.string().optional(),
-        sortKey: z.nativeEnum(UserSortKeys, { message: errorMessage.INVALID_SORT_KEY }).optional(),
-        username: z.string().optional()
-    })
+
+export const accountDeletionQuerySchema = z.object({
+    otp: otpSchema
+}).strict();

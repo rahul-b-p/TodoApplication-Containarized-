@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { FunctionStatus, Roles, UserSortArgs } from "../enums";
 import { getPaginationParams } from "../helpers";
 import { IUser } from "../interfaces";
@@ -116,14 +117,53 @@ export const findUserById = async (_id: string): Promise<IUser | null> => {
 /**
  * To Get Unsensitive UserData By its id
  */
-export const findUserDatasById = async (_id: string): Promise<UserToShow | null> => {
+export const findUserDatasById = async (id: string): Promise<UserToShow | null> => {
     const functionName = findUserDatasById.name;
     try {
-        const user = await User.findById(_id).select('-password -refreshToken -__v');
-        if (!user) return null;
+        const user: UserToShow[] = await User.aggregate([
+            {
+                $match: { _id: new Types.ObjectId(id) }
+            },
+            {
+                $lookup: {
+                    from: 'todos',
+                    localField: '_id',
+                    foreignField: 'createdBy',
+                    as: 'todos',
+                    pipeline: [
+                        {
+                            $match: { isDeleted: false }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                title: 1,
+                                description: 1,
+                                dueAt: 1,
+                                completed: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    username: 1,
+                    email: 1,
+                    phone: 1,
+                    role: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    verified: 1,
+                    todos: 1
+                }
+            }
+        ]);
+        if (user.length !== 1) return null;
 
         logFunctionInfo(functionName, FunctionStatus.SUCCESS);
-        return user as UserToShow;
+        return user[0] as UserToShow;
     } catch (error: any) {
         logFunctionInfo(functionName, FunctionStatus.FAIL, error.message);
         throw new Error(error.message);

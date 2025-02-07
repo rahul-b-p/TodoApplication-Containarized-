@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { Roles, UserSortKeys } from "../enums";
-import { IUser } from "../interfaces";
+import { IToDo, IUser } from "../interfaces";
 import { PageFilter, PageInfo } from "./page.type";
 import { boolean } from "zod";
 
@@ -43,6 +43,7 @@ export type UserToShow = UserAuthBody & {
     verified: boolean
     createdAt: Date;
     updatedAt: Date;
+    todos?: IToDo;
 }
 
 export type UserUpdateBody = Partial<Omit<UserInsertArgs, 'password'>> & {
